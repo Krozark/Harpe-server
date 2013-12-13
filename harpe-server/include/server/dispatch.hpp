@@ -5,7 +5,7 @@ namespace ntw
 {
     class SocketSerialized;
 
-    void dispatch(int id,SocketSerialized& request);
+    int dispatch(int id,SocketSerialized& request);
 }
 
 #endif
