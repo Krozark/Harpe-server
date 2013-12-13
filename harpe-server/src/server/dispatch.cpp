@@ -1,6 +1,8 @@
 #include <server/dispatch.hpp>
-#include <server/functions.hpp>
+
 #include <Socket/FuncWrapper.hpp>
+
+#include <server/functions.hpp>
 
 namespace ntw
 {
@@ -13,6 +15,10 @@ namespace ntw
             {
                 res = ntw::FuncWrapper::srv::exec(getVersion,request);
             }break;
+            case FUNCTION_ID::ANALYSE:
+            {
+                res = ntw::FuncWrapper::srv::exec(analyse,request);
+            }
             default:
             break;
         }

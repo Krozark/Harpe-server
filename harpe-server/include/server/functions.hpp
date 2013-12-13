@@ -5,9 +5,12 @@
 
 enum FUNCTION_ID
 {
-    GET_VERSION=1
+    GET_VERSION=1,
+    ANALYSE=2
 };
 
 int getVersion(ntw::SocketSerialized& sock);
+
+int analyse(ntw::SocketSerialized& sock,int mgf_pk);  
 
 #endif
