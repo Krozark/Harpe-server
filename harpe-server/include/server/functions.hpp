@@ -9,8 +9,13 @@ enum FUNCTION_ID
     ANALYSE=2
 };
 
-int getVersion(ntw::SocketSerialized& sock);
+enum ERRORS {
+    INPUT_NOT_VALID = 1,
+    EMPTY_INPUT
+};
 
-int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data);
+int getVersion(ntw::SocketSerialized& sock,int& status);
+
+int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_data);
 
 #endif
