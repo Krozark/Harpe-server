@@ -11,6 +11,6 @@ enum FUNCTION_ID
 
 int getVersion(ntw::SocketSerialized& sock);
 
-int analyse(ntw::SocketSerialized& sock,int mgf_pk);  
+int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data);
 
 #endif
