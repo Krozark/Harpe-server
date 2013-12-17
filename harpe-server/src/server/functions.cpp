@@ -1,9 +1,15 @@
 #include <server/functions.hpp>
 
 #include <server/defines.hpp>
+#include <server/models.hpp>
+
 #include <mgf/Driver.hpp>
-#include <sstream>
+
 #include <Socket/FuncWrapper.hpp>
+
+#include <sstream>
+#include <list>
+
 
 int getVersion(ntw::SocketSerialized& sock,int& status)
 {
@@ -19,6 +25,7 @@ int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_
     mgf::Driver driver(stream);
     mgf::Analyse analyse = driver.parse();
 
+    //is a valid MGF format
     if (not driver.isValid())
     {
         LOG(sock,"analyse","INPUT_NOT_VALID");
@@ -26,28 +33,49 @@ int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_
         return 0;
     }
 
-    if(analyse.size()<=0)
+    /// as peptides
+    const unsigned int size = analyse.size();
+    LOG(sock,"analyse",size<<" peptides to analyse");
+    if(size<=0)
     {
         LOG(sock,"analyse","EMPTY_INPUT");
         status = ERRORS::EMPTY_INPUT;
         return 0;
     }
 
-    const unsigned int size = analyse.size();
-    LOG(sock,"analyse",size<<" peptides to analyse");
+    ///get the analyse from bdd
+    auto& bdd_analyse = AnalyseMgf::get(mgf_pk);
+    std::cout<<"AnalyseMgf pk="<<mgf_pk<<" : "<<*bdd_analyse<<std::endl;
 
+    if( not bdd_analyse)
+    {
+        LOG(sock,"analyse","PK_ERROR");
+        status = ERRORS::PK_ERROR;
+        return 0;
+    }
+    
     ///\todo save in bdd
-    for(unsigned int i=0;i<size;++i)
+    std::list<AnalysePeptide> peptides;
+    const std::list<mgf::Spectrum*>& spectrums = analyse.getSpectrums();
+
+    for(mgf::Spectrum* spectrum : spectrums)
     {
-        ///save
+        peptides.emplace_back();
+        AnalysePeptide& pep = peptides.back();
+
+        pep.analyse = bdd_analyse;
+
+        pep.name = spectrum->getHeader().getTitle();
+
+        std::stringstream stream;
+        stream<<*spectrum;
+        pep.mgf_part = stream.str();
+
+        pep.save();
     }
 
-
+    
     ///\todo send to clients
-    for(unsigned int i=0;i<size;++i)
-    {
-        ///send
-    }
     
     return size;
 }

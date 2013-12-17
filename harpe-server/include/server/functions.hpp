@@ -11,7 +11,8 @@ enum FUNCTION_ID
 
 enum ERRORS {
     INPUT_NOT_VALID = 1,
-    EMPTY_INPUT
+    EMPTY_INPUT,
+    PK_ERROR
 };
 
 int getVersion(ntw::SocketSerialized& sock,int& status);

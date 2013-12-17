@@ -5,7 +5,6 @@ orm::Bdd& orm::Bdd::Default = def;
 
 #include <Socket/server/Server.hpp>
 #include <Socket/Config.hpp>
-#include <server/models.hpp>
 #include <stdio.h>
 
 #define WEBSITE_HOST 1
