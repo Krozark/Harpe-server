@@ -13,6 +13,121 @@ orm::Bdd& orm::Bdd::Default = def;
 #define SERVER_PORT 3
 #define CLIENT_PORT 4
 
+
+int register_to_website(char host[],int port,char name[])
+{
+    int status = 0;
+
+    std::cout<<"[Loggin to website] "<<host<<":"<<port<<std::endl;
+    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
+    website_sock.connect(host,port);
+    std::string msg;
+    msg += std::string("GET /register/?name=");
+    msg += name;
+    msg += "&port=";
+    msg += std::to_string(ntw::Config::port_server);
+    msg +=" ";
+    msg += "HTTP/1.1\r\nHOST: ";
+    msg += host;
+    msg += "\r\n\r\n";
+
+    char buffer[1024];
+    website_sock.send(msg.c_str(),msg.size());
+
+    int recv;
+    float version = 0;
+    while((recv = website_sock.receive(buffer,1024))>0)
+    {
+        //std::cout.write(buffer,recv);
+        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+    }
+    //std::cout<<std::endl<<std::flush;
+
+    if(version > 0)
+    {
+        std::cout<<"Status : "<<status<<std::endl;
+        switch (status)
+        {
+            case 200 :///ok
+                {
+                }break;
+            case 211 : /// no name (set in code)
+                {
+                }break;
+            case 212 :/// no port (set in code)
+                {
+                }break;
+            case 213 :///unknow ip
+                {
+                }break;
+            case 214 :/// no object find
+                {
+                }break;
+            default:///?
+                {
+                }break;
+        }
+    }
+    return status;
+}
+
+int unregister_to_website(char host[],int port,char name[])
+{
+    int status = 0;
+
+    std::cout<<"[Unloggin to website] "<<host<<":"<<port<<std::endl;
+    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
+    website_sock.connect(host,port);
+    std::string msg;
+    msg += std::string("GET /unregister/?name=");
+    msg += name;
+    msg += "&port=";
+    msg += std::to_string(ntw::Config::port_server);
+    msg +=" ";
+    msg += "HTTP/1.1\r\nHOST: ";
+    msg += host;
+    msg += "\r\n\r\n";
+
+    char buffer[1024];
+    website_sock.send(msg.c_str(),msg.size());
+
+    int recv;
+    float version = 0;
+    while((recv = website_sock.receive(buffer,1024))>0)
+    {
+        //std::cout.write(buffer,recv);
+        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+    }
+    //std::cout<<std::endl<<std::flush;
+
+    if(version > 0)
+    {
+        std::cout<<"Status : "<<status<<std::endl;
+        switch (status)
+        {
+            case 200 :///ok
+                {
+                }break;
+            case 211 : /// no name (set in code)
+                {
+                }break;
+            case 212 :/// no port (set in code)
+                {
+                }break;
+            case 213 :///unknow ip
+                {
+                }break;
+            case 214 :/// no object find
+                {
+                }break;
+            default:///?
+                {
+                }break;
+        }
+    }
+    return status;
+}
+
 int main(int argc,char* argv[])
 {
     if(argc < SERVER_PORT)
@@ -39,68 +154,10 @@ int main(int argc,char* argv[])
     ntw::Config::broadcast = false;
     const unsigned int max_client = 100;
 
-    int return_code = 0;
+    ///register from the website
+    int return_code = register_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
 
-    ///\todo regester to the website
-    {
-        std::cout<<"[Loggin to website] "<<argv[WEBSITE_HOST]<<":"<<website_port<<std::endl;
-        ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
-        website_sock.connect(argv[WEBSITE_HOST],website_port);
-        std::string msg;
-        msg += std::string("GET /register/?name=");
-        msg += "Lyre&port=";
-        msg += ntw::Config::port_server;
-        msg +=" ";
-        msg += "HTTP/1.1\r\nHOST: ";
-        msg += argv[WEBSITE_HOST];
-        msg += "\r\n\r\n";
-
-        char buffer[1024];
-        website_sock.send(msg.c_str(),msg.size());
-
-        int recv;
-        float version = 0;
-        int status = 0;
-        while((recv = website_sock.receive(buffer,1024))>0)
-        {
-            std::cout.write(buffer,recv);
-            sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
-        }
-        std::cout<<std::endl<<std::flush;
-
-        if(version > 0)
-        {
-            std::cout<<"Status : "<<status<<std::endl;
-            switch (status)
-            {
-                case 200 :///ok
-                {
-                }break;
-                case 211 : /// no name (set in code)
-                {
-                    return_code=status;
-                }break;
-                case 212 :/// no port (set in code)
-                {
-                    return_code=status;
-                }break;
-                case 213 :///unknow ip
-                {
-                    return_code=status;
-                }break;
-                case 214 :/// no object find
-                {
-                    return_code=status;
-                }break;
-                default:///?
-                {
-                    return_code=status;
-                }break;
-            }
-        }
-        //website_sock.shutdown();
-    }
-    if(return_code == 0)
+    if(return_code == 200)
     {
         /// inti database
         orm::Bdd::Default.connect();
@@ -114,16 +171,12 @@ int main(int argc,char* argv[])
 
 
         ntw::srv::Server server(max_client);
-        //server.start();
-        //server.wait();
-
+        server.start();
+        server.wait();
 
         orm::Bdd::Default.disconnect();
-        ///\todo unregister from the website
+        ///unregister from the website
+        unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     }
-    else
-    {
-    }
-
     return return_code;
 }
