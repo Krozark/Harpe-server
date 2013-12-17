@@ -6,6 +6,7 @@ orm::Bdd& orm::Bdd::Default = def;
 #include <Socket/server/Server.hpp>
 #include <Socket/Config.hpp>
 #include <server/models.hpp>
+#include <stdio.h>
 
 #define WEBSITE_HOST 1
 #define WEBSITE_PORT 2
@@ -38,6 +39,8 @@ int main(int argc,char* argv[])
     ntw::Config::broadcast = false;
     const unsigned int max_client = 100;
 
+    int return_code = 0;
+
     ///\todo regester to the website
     {
         std::cout<<"[Loggin to website] "<<argv[WEBSITE_HOST]<<":"<<website_port<<std::endl;
@@ -54,30 +57,73 @@ int main(int argc,char* argv[])
 
         char buffer[1024];
         website_sock.send(msg.c_str(),msg.size());
-        while(website_sock.receive(buffer,1024))
+
+        int recv;
+        float version = 0;
+        int status = 0;
+        while((recv = website_sock.receive(buffer,1024))>0)
         {
-            std::cout<<buffer<<std::endl;
+            std::cout.write(buffer,recv);
+            sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+        }
+        std::cout<<std::endl<<std::flush;
+
+        if(version > 0)
+        {
+            std::cout<<"Status : "<<status<<std::endl;
+            switch (status)
+            {
+                case 200 :///ok
+                {
+                }break;
+                case 211 : /// no name (set in code)
+                {
+                    return_code=status;
+                }break;
+                case 212 :/// no port (set in code)
+                {
+                    return_code=status;
+                }break;
+                case 213 :///unknow ip
+                {
+                    return_code=status;
+                }break;
+                case 214 :/// no object find
+                {
+                    return_code=status;
+                }break;
+                default:///?
+                {
+                    return_code=status;
+                }break;
+            }
         }
         //website_sock.shutdown();
     }
-    /// inti database
-    orm::Bdd::Default.connect();
+    if(return_code == 0)
+    {
+        /// inti database
+        orm::Bdd::Default.connect();
 
-    std::cout<<"[Server start] on:"
-        <<"\n\tPort : "<<ntw::Config::port_server
-        <<"\n\tclient port : "<<ntw::Config::port_client
-        <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
-        <<"\n\twebiet port : "<<argv[WEBSITE_PORT]
-        <<std::endl;
-    
-
-    ntw::srv::Server server(max_client);
-    //server.start();
-    //server.wait();
+        std::cout<<"[Server start] on:"
+            <<"\n\tPort : "<<ntw::Config::port_server
+            <<"\n\tclient port : "<<ntw::Config::port_client
+            <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
+            <<"\n\twebiet port : "<<argv[WEBSITE_PORT]
+            <<std::endl;
 
 
-    orm::Bdd::Default.disconnect();
-    ///\todo unregister from the website
+        ntw::srv::Server server(max_client);
+        //server.start();
+        //server.wait();
 
-    return 0;
+
+        orm::Bdd::Default.disconnect();
+        ///\todo unregister from the website
+    }
+    else
+    {
+    }
+
+    return return_code;
 }
