@@ -148,7 +148,7 @@ int main(int argc,char* argv[])
     else
         ntw::Config::port_client = 3988;
 
-    ntw::Config::max_connexion = 5;
+    ntw::Config::max_connexion = 10;
     ntw::Config::default_timeout = 5.f;
     ntw::Config::broadcast = false;
     const unsigned int max_client = 100;

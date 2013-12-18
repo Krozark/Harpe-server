@@ -59,6 +59,8 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
 {
     public :
         AnalysePeptide();
+        AnalysePeptide(AnalysePeptide&&) = default;
+        AnalysePeptide& operator=(AnalysePeptide&&) = default;
 
         orm::FK<AnalyseMgf,false> analyse;
         orm::CharField<255> name;

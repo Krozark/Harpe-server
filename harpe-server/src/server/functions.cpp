@@ -8,16 +8,24 @@
 #include <Socket/FuncWrapper.hpp>
 
 #include <sstream>
-#include <list>
+#include <deque>
+#include <memory>
+
+#include <chrono>
+#include <thread>
+#include <mutex>
 
 
-int getVersion(ntw::SocketSerialized& sock,int& status)
+std::mutex peptides_mutex;
+std::deque<std::shared_ptr<AnalysePeptide>> peptides;
+
+int getVersion(ntw::SocketSerialized& sock)
 {
     LOG(sock,"getVersion","");
     return VERSION;
 };
 
-int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_data)
+int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
 {
     LOG(sock,"analyse","");
     ///découpage
@@ -29,7 +37,7 @@ int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_
     if (not driver.isValid())
     {
         LOG(sock,"analyse","INPUT_NOT_VALID");
-        status = ERRORS::INPUT_NOT_VALID;
+        sock.setStatus(ERRORS::INPUT_NOT_VALID);
         return 0;
     }
 
@@ -39,7 +47,7 @@ int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_
     if(size<=0)
     {
         LOG(sock,"analyse","EMPTY_INPUT");
-        status = ERRORS::EMPTY_INPUT;
+        sock.setStatus(ERRORS::EMPTY_INPUT);
         return 0;
     }
 
@@ -50,32 +58,53 @@ int analyse(ntw::SocketSerialized& sock,int& status,int mgf_pk,std::string file_
     if( not bdd_analyse)
     {
         LOG(sock,"analyse","PK_ERROR");
-        status = ERRORS::PK_ERROR;
+        sock.setStatus(ERRORS::PK_ERROR);
         return 0;
     }
     
     ///\todo save in bdd
-    std::list<AnalysePeptide> peptides;
     const std::list<mgf::Spectrum*>& spectrums = analyse.getSpectrums();
-
+    
+    peptides_mutex.lock();
     for(mgf::Spectrum* spectrum : spectrums)
     {
-        peptides.emplace_back();
-        AnalysePeptide& pep = peptides.back();
+        peptides.emplace_back(new AnalysePeptide);
+        std::shared_ptr<AnalysePeptide>& pep = peptides.back();
 
-        pep.analyse = bdd_analyse;
+        pep->analyse = bdd_analyse;
 
-        pep.name = spectrum->getHeader().getTitle();
+        pep->name = spectrum->getHeader().getTitle();
 
         std::stringstream stream;
         stream<<*spectrum;
-        pep.mgf_part = stream.str();
+        pep->mgf_part = stream.str();
 
-        pep.save();
+        pep->save();
     }
-
-    
-    ///\todo send to clients
+    peptides_mutex.unlock();
     
     return size;
+}
+
+void clientWaitForWork(ntw::SocketSerialized& sock)
+{
+    while(true)
+    {
+        peptides_mutex.lock();
+        if (peptides.size() >0)
+        {
+            std::shared_ptr<AnalysePeptide> pep = peptides.front();
+            peptides.pop_front();
+            peptides_mutex.unlock();
+
+            sock.setStatus(DATA_SEND_IGNORE);
+            //return std::move(*pep);
+        }
+        else
+        {
+            peptides_mutex.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+    }
+    sock.setStatus(DATA_SEND_IGNORE);
 }
