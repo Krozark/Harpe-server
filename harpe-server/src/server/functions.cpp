@@ -72,12 +72,13 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         std::shared_ptr<AnalysePeptide>& pep = peptides.back();
 
         pep->analyse = bdd_analyse;
-
         pep->name = spectrum->getHeader().getTitle();
 
         std::stringstream stream;
         stream<<*spectrum;
         pep->mgf_part = stream.str();
+
+        pep->is_done = false;
 
         pep->save();
     }
@@ -91,14 +92,20 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
     while(true)
     {
         peptides_mutex.lock();
+        std::cout<<"waiting"<<std::endl;
         if (peptides.size() >0)
         {
             std::shared_ptr<AnalysePeptide> pep = peptides.front();
             peptides.pop_front();
             peptides_mutex.unlock();
+            
+            pep->is_done = true;
+
+            pep->save();
 
             sock.setStatus(DATA_SEND_IGNORE);
             //return std::move(*pep);
+            return;
         }
         else
         {

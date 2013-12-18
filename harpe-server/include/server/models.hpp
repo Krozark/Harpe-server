@@ -65,8 +65,9 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
         orm::FK<AnalyseMgf,false> analyse;
         orm::CharField<255> name;
         orm::TextField mgf_part;
+        orm::BooleanField is_done;
 
-        MAKE_STATIC_COLUMN(analyse,name,mgf_part);
+        MAKE_STATIC_COLUMN(analyse,name,mgf_part,is_done);
 };
 
 #include <server/models.tpl>

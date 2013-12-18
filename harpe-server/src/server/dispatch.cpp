@@ -9,7 +9,7 @@ namespace ntw
     int dispatch(int id,SocketSerialized& request)
     {
         int res= FuncWrapper::Status::st::wrong_id;
-        std::cout<<"func id:"<<id<<std::endl<<std::flush;
+        std::cout<<"[dispatch] id:"<<id<<std::endl<<std::flush;
         switch(id)
         {
             case FUNCTION_ID::GET_VERSION:
@@ -19,7 +19,11 @@ namespace ntw
             case FUNCTION_ID::ANALYSE:
             {
                 res = ntw::FuncWrapper::srv::exec(analyse,request);
-            }
+            }break;
+            case FUNCTION_ID::CLIENT_WAIT_FOR_WORK :
+            {
+                res = ntw::FuncWrapper::srv::exec(clientWaitForWork,request);
+            }break;
             default:
             break;
         }
