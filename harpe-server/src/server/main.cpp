@@ -1,6 +1,6 @@
 ///data base
 #include <ORM/backends/Sqlite3.hpp>
-orm::Sqlite3Bdd def("/home/maxime/Documents/git/Harpe-website/Harpe-website/dev.db");
+orm::Sqlite3Bdd def("../../Harpe-website/Harpe-website/dev.db");
 orm::Bdd& orm::Bdd::Default = def;
 
 #include <Socket/server/Server.hpp>
