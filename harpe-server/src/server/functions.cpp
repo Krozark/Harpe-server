@@ -89,7 +89,10 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
 
 void clientWaitForWork(ntw::SocketSerialized& sock)
 {
-    while(true)
+    int time = 5*60*1000; //min * secondes * millisecondes
+    constexpr int delta = 500; //milisecondes
+
+    while(time>0)
     {
         peptides_mutex.lock();
         std::cout<<"waiting"<<std::endl;
@@ -103,15 +106,16 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
 
             pep->save();
 
-            sock.setStatus(DATA_SEND_IGNORE);
+            sock.setStatus(ERRORS::EMPTY_DATA_SEND);
             //return std::move(*pep);
             return;
         }
         else
         {
             peptides_mutex.unlock();
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(delta));
+            time=-delta;
         }
     }
-    sock.setStatus(DATA_SEND_IGNORE);
+    sock.setStatus(ERRORS::TIMEOUT);
 }
