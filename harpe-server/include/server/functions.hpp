@@ -20,6 +20,8 @@ enum ERRORS {
     TIMEOUT = 5
 };
 
+int init_deque_peptide();
+
 int getVersion(ntw::SocketSerialized& sock);
 
 int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data);

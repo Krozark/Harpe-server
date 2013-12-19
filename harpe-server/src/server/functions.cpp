@@ -1,4 +1,6 @@
+
 #include <server/functions.hpp>
+
 
 #include <server/defines.hpp>
 #include <server/models.hpp>
@@ -6,6 +8,7 @@
 #include <mgf/Driver.hpp>
 
 #include <Socket/FuncWrapper.hpp>
+
 
 #include <sstream>
 #include <deque>
@@ -18,6 +21,22 @@
 
 std::mutex peptides_mutex;
 std::deque<std::shared_ptr<AnalysePeptide>> peptides;
+
+int init_deque_peptide()
+{
+    std::list<orm::Cache<AnalysePeptide>::type_ptr> results;    
+
+    AnalysePeptide::query()\
+        .filter(false,"exact",AnalysePeptide::_is_done)\
+        .orderBy("id")\
+        .get(results);
+
+    std::cout<<"[init_deque_peptide] "<<results.size()<<" peptides to calc"<<std::endl;
+    for(auto& i : results)
+    {
+        peptides.emplace_back(std::move(i));
+    }
+}
 
 int getVersion(ntw::SocketSerialized& sock)
 {
@@ -64,7 +83,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     
     ///\todo save in bdd
     const std::list<mgf::Spectrum*>& spectrums = analyse.getSpectrums();
-    
+   
     peptides_mutex.lock();
     for(mgf::Spectrum* spectrum : spectrums)
     {
@@ -89,32 +108,32 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
 
 void clientWaitForWork(ntw::SocketSerialized& sock)
 {
-    int time = 5*60*1000; //min * secondes * millisecondes
+    int time = 1*60*1000; //min * secondes * millisecondes
     constexpr int delta = 500; //milisecondes
 
     while(time>0)
     {
         peptides_mutex.lock();
-        std::cout<<"waiting"<<std::endl;
         if (peptides.size() >0)
         {
             std::shared_ptr<AnalysePeptide> pep = peptides.front();
             peptides.pop_front();
             peptides_mutex.unlock();
             
-            pep->is_done = true;
+            //pep->is_done = true;
 
-            pep->save();
+            //pep->save();
+            
+            sock<<*pep;
+            std::cout<<"[clientWaitForWork] Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
 
-            sock.setStatus(ERRORS::EMPTY_DATA_SEND);
-            //return std::move(*pep);
             return;
         }
         else
         {
             peptides_mutex.unlock();
             std::this_thread::sleep_for(std::chrono::milliseconds(delta));
-            time=-delta;
+            time-=delta;
         }
     }
     sock.setStatus(ERRORS::TIMEOUT);

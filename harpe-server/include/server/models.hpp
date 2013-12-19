@@ -5,6 +5,8 @@
 #include <ORM/fields/ManyToMany.hpp>
 #include <ORM/models/SQLObject.hpp>
 
+#include <Socket/Serializer.hpp>
+
 class AA : public orm::SQLObject<AA>
 {
     public:
@@ -59,8 +61,11 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
 {
     public :
         AnalysePeptide();
+        AnalysePeptide(const AnalysePeptide&) = delete;
+        AnalysePeptide& operator=(const AnalysePeptide&) = delete;
         AnalysePeptide(AnalysePeptide&&) = default;
         AnalysePeptide& operator=(AnalysePeptide&&) = default;
+
 
         orm::FK<AnalyseMgf,false> analyse;
         orm::CharField<255> name;
@@ -68,7 +73,23 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
         orm::BooleanField is_done;
 
         MAKE_STATIC_COLUMN(analyse,name,mgf_part,is_done);
+
+
+        friend ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalysePeptide& self)
+        {
+            stream<<self.pk<<self.analyse.getFk()<<self.mgf_part;
+            return stream;
+        }
+
+        /*friend Serializer& operator>>(Serializer& stream,const AnalysePeptide& self)
+        {
+            stream>>self.code;
+            return stream;
+        }*/
 };
+#include <deque>
+extern std::deque<std::shared_ptr<AnalysePeptide>> peptides;
+
 
 #include <server/models.tpl>
 #endif

@@ -7,6 +7,8 @@ orm::Bdd& orm::Bdd::Default = def;
 #include <Socket/Config.hpp>
 #include <stdio.h>
 
+#include <server/functions.hpp>
+
 #define WEBSITE_HOST 1
 #define WEBSITE_PORT 2
 #define SERVER_PORT 3
@@ -160,6 +162,7 @@ int main(int argc,char* argv[])
     {
         /// inti database
         orm::Bdd::Default.connect();
+        init_deque_peptide();
 
         std::cout<<"[Server start] on:"
             <<"\n\tPort : "<<ntw::Config::port_server
