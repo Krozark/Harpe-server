@@ -176,7 +176,7 @@ int main(int argc,char* argv[])
             <<"\n\tPort : "<<ntw::Config::port_server
             <<"\n\tclient port : "<<ntw::Config::port_client
             <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
-            <<"\n\twebiet port : "<<argv[WEBSITE_PORT]
+            <<"\n\twebsiet port : "<<argv[WEBSITE_PORT]
             <<std::endl;
 
 

@@ -79,9 +79,6 @@ class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
             return stream;
         }
 
-    protected:
-
-    private:
 };
 
 class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
@@ -109,12 +106,6 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
                 <<*(self.analyse);
             return stream;
         }
-
-        /*friend Serializer& operator>>(Serializer& stream,const AnalysePeptide& self)
-        {
-            stream>>self.code;
-            return stream;
-        }*/
 };
 
 /*
