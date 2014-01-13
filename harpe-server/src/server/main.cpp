@@ -14,7 +14,9 @@ orm::Bdd& orm::Bdd::Default = def;
 #define SERVER_PORT 3
 #define CLIENT_PORT 4
 
-
+/***
+ * \brief Register the server to the website interface
+ */
 int register_to_website(char host[],int port,char name[])
 {
     int status = 0;
@@ -72,6 +74,9 @@ int register_to_website(char host[],int port,char name[])
     return status;
 }
 
+/**
+ * \brief Unregister the server to the website interface
+ */
 int unregister_to_website(char host[],int port,char name[])
 {
     int status = 0;
@@ -129,6 +134,9 @@ int unregister_to_website(char host[],int port,char name[])
     return status;
 }
 
+/**
+ *  \brief The main function who start the server
+ */
 int main(int argc,char* argv[])
 {
     if(argc < SERVER_PORT)

@@ -119,7 +119,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             std::shared_ptr<AnalysePeptide> pep = peptides.front();
             peptides.pop_front();
             peptides_mutex.unlock();
-            
+            std::string part = pep->mgf_part;
             //pep->is_done = true;
 
             //pep->save();
