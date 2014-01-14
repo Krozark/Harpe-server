@@ -125,7 +125,6 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             //pep->save();
             
             sock<<*pep;
-            std::cout<<sock<<std::endl;
             std::cout<<"[clientWaitForWork] Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
 
             return;
