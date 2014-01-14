@@ -17,7 +17,8 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
-
+#include <chrono>
+#include <thread>
 
 std::mutex peptides_mutex;
 std::deque<std::shared_ptr<AnalysePeptide>> peptides;
@@ -142,6 +143,10 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
 void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 {
     std::cout<<"Recv solutions for AnalyseMgf of pk "<<id<<std::endl;
+    unsigned int size = 0;
+    sock>>size;
+    std::cout<<size<<std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 
