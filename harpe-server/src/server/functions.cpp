@@ -138,3 +138,10 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
     }
     sock.setStatus(ERRORS::TIMEOUT);
 }
+
+void sendPeptideResults(ntw::SocketSerialized& sock,int id)
+{
+    std::cout<<"Recv solutions for AnalyseMgf of pk "<<id<<std::endl;
+}
+
+

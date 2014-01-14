@@ -13,6 +13,7 @@ enum FUNCTION_ID
     GET_VERSION=1,
     ANALYSE=2,
     CLIENT_WAIT_FOR_WORK=3,
+    SEND_PEPTIDE_RESULTS=4
 };
 
 /**
@@ -46,5 +47,11 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data);
  * and send it when avalible
  */
 void clientWaitForWork(ntw::SocketSerialized& sock);
+
+/**
+ * \brief recv result from client
+ * \param pk the analyseMgf pk
+ */
+void sendPeptideResults(ntw::SocketSerialized& sock,int id);
 
 #endif

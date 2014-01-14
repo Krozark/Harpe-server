@@ -24,6 +24,10 @@ namespace ntw
             {
                 res = ntw::FuncWrapper::srv::exec(clientWaitForWork,request);
             }break;
+            case FUNCTION_ID::SEND_PEPTIDE_RESULTS : 
+            {
+                res = ntw::FuncWrapper::srv::exec(sendPeptideResults,request);
+            }
             default:
             break;
         }
