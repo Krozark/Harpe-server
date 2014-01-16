@@ -73,7 +73,7 @@ class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
         {
             auto aas = self.AAs.all();
             stream<<self.pk
-                <<aas.size();
+                <<(unsigned int)aas.size();
             for(auto& aa_ptr: aas)
                 stream<<*aa_ptr;
             return stream;
