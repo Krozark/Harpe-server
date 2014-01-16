@@ -26,11 +26,11 @@ namespace ntw
             }break;
             case FUNCTION_ID::SEND_PEPTIDE_RESULTS : 
             {
-                /*int pk;
+                int pk;
                 request>>pk;
                 sendPeptideResults(request,pk);
-                res = request.getStatus();*/
-                res = ntw::FuncWrapper::srv::exec(sendPeptideResults,request);
+                res = request.getStatus();
+
             }break;
             default:
             break;

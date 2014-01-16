@@ -144,10 +144,10 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 {
     std::cout<<"Recv solutions for AnalyseMgf of pk "<<id<<std::endl;
     unsigned int size = 0;
-    //sock>>size;
-    //std::cout<<size<<std::endl;
+    sock>>size;
+    std::cout<<"size: "<<size<<std::endl;
 
-    /*for(unsigned int i=0;i<size;++i)
+    for(unsigned int i=0;i<size;++i)
     {
         double score;
         unsigned int seq_size;
@@ -173,12 +173,12 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
             is_peak= not is_peak; 
         }
         std::cout<<std::endl;
-    }*/
+    }
 
-    /*sock.clear();
+    sock.clear();
     sock.setStatus(ntw::FuncWrapper::Status::ok);
     std::cout<<"[clientWaitForWork] Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
-    sock.sendCl();*/
+    sock.sendCl();
 }
 
 
