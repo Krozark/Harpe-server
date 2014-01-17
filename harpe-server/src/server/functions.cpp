@@ -6,6 +6,8 @@
 #include <server/models.hpp>
 
 #include <mgf/Driver.hpp>
+#include <mgf/Convert.hpp>
+
 
 #include <Socket/FuncWrapper.hpp>
 
@@ -93,6 +95,9 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
 
         pep->analyse = bdd_analyse;
         pep->name = spectrum->getHeader().getTitle();
+        pep->mz = spectrum->getHeader().getMz();
+        pep->intensity = spectrum->getHeader().getIntensity();
+        pep->charge = spectrum->getHeader().getCharge();
 
         std::stringstream stream;
         stream<<*spectrum;
@@ -146,6 +151,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
     auto& pep = AnalysePeptide::get(id);
     pep->is_done = true;
+    std::cout<<*pep<<std:endl;
     
 
     for(unsigned int i=0;i<size;++i)
@@ -160,7 +166,6 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
         result.score = score;
 
         bool is_peak = true;
-        std::cout<<"#"<<i<<"["<<score<<"] ";
         for(unsigned int j=0;j<seq_size;++j)
         {
             if(is_peak) //peak token

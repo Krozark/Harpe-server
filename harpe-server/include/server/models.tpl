@@ -17,7 +17,7 @@ AnalyseMgf::AnalyseMgf() : mgf(AnalyseMgf::_mgf), enzyme(AnalyseMgf::_enzyme), A
 
 
 /********************** AnalysePeptide ******************************/
-REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mgf_part,"mgf_part",is_done,"is_done");
+REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",is_done,"is_done");
 
 
 /******************** CalculatedPeptide *****************************/
