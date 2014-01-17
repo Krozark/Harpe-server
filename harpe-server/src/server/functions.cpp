@@ -128,7 +128,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             std::string part = pep->mgf_part;
             
             sock<<*pep;
-            std::cout<<"[clientWaitForWork] Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
+            std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
 
             return;
         }
@@ -144,15 +144,12 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
 
 void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 {
-    std::cout<<"Recv solutions for AnalyseMgf of pk "<<id<<std::endl;
     unsigned int size = 0;
     sock>>size;
-    std::cout<<"size: "<<size<<std::endl;
+    std::cout<<"[sendPeptideResults] <"<<sock.id()<<"> Recv solutions <"<<size<<"> for AnalyseMgf of pk <"<<id<<">"<<std::endl;
 
     auto& pep = AnalysePeptide::get(id);
     pep->is_done = true;
-    std::cout<<*pep<<std:endl;
-    
 
     for(unsigned int i=0;i<size;++i)
     {
@@ -191,7 +188,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
     sock.clear();
     sock.setStatus(ntw::FuncWrapper::Status::ok);
-    std::cout<<"[clientWaitForWork] Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
+    std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
     sock.sendCl();
 }
 
