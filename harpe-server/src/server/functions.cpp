@@ -121,9 +121,6 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             peptides.pop_front();
             peptides_mutex.unlock();
             std::string part = pep->mgf_part;
-            //pep->is_done = true;
-
-            //pep->save();
             
             sock<<*pep;
             std::cout<<"[clientWaitForWork] Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
@@ -147,12 +144,20 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
     sock>>size;
     std::cout<<"size: "<<size<<std::endl;
 
+    auto& pep = AnalysePeptide::get(id);
+    pep->is_done = true;
+    
+
     for(unsigned int i=0;i<size;++i)
     {
         double score;
         unsigned int seq_size;
         sock>>score //score of the solution
             >>seq_size; //size of the sequence
+
+        CalculatedPeptide result;
+        result.analyse = pep;
+        result.score = score;
 
         bool is_peak = true;
         std::cout<<"#"<<i<<"["<<score<<"] ";
@@ -162,18 +167,22 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
             {
                 double mass;
                 sock>>mass;
-                std::cout<<"peak("<<mass<<"),";
+                result.sequence+=std::to_string(mass);
             }
             else //AA token
             {
                 int pk;
                 sock>>pk;
-                std::cout<<"AA("<<pk<<"),";
+                result.sequence+=std::to_string(pk);
             }
             is_peak= not is_peak; 
+            if(j<seq_size-1)
+                result.sequence+=",";
         }
-        std::cout<<std::endl;
+        result.save();
     }
+
+    pep->save();
 
     sock.clear();
     sock.setStatus(ntw::FuncWrapper::Status::ok);

@@ -108,12 +108,22 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
         }
 };
 
-/*
-class CalculatedPeptide(models.Model):
-    score       = models.FloatField(_("Score"),null=False,blank=False)
-    sequence    = models.TextField(_("Séquence"),null=False,blank=False,help_text = u"peak_masse(AA_id,peak_masse)*")
-    analyse     = models.ForeignKey(AnalysePeptide,null=False,blank=False)
-*/
+class CalculatedPeptide : public orm::SQLObject<CalculatedPeptide>
+{
+    public:
+        CalculatedPeptide();
+        CalculatedPeptide(const CalculatedPeptide&) = delete;
+        CalculatedPeptide& operator=(const CalculatedPeptide&) = delete;
+        CalculatedPeptide(CalculatedPeptide&&) = default;
+        CalculatedPeptide& operator=(CalculatedPeptide&&) = default;
+
+        orm::DoubleField score;
+        orm::TextField sequence;
+        orm::FK<AnalysePeptide,false> analyse;
+
+        MAKE_STATIC_COLUMN(score,sequence,analyse);
+};
+
 #include <deque>
 extern std::deque<std::shared_ptr<AnalysePeptide>> peptides;
 
