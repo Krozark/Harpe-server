@@ -97,9 +97,9 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
         orm::IntegerField   intensity;
         orm::IntegerField   charge;
         orm::TextField mgf_part;
-        orm::BooleanField is_done;
+        orm::IntegerField status;
 
-        MAKE_STATIC_COLUMN(analyse,name,mz,intensity,charge,mgf_part,is_done);
+        MAKE_STATIC_COLUMN(analyse,name,mz,intensity,charge,mgf_part,status);
 
 
         friend ntw::Serializer& operator<<(ntw::Serializer& stream,AnalysePeptide& self)

@@ -30,7 +30,7 @@ int init_deque_peptide()
     std::list<orm::Cache<AnalysePeptide>::type_ptr> results;    
 
     AnalysePeptide::query()\
-        .filter(false,"exact",AnalysePeptide::_is_done)\
+        .filter(0,"exact",AnalysePeptide::_status)\
         .orderBy("id")\
         .get(results);
 
@@ -103,7 +103,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         stream<<*spectrum;
         pep->mgf_part = stream.str();
 
-        pep->is_done = false;
+        pep->status = 0;
 
         pep->save();
     }
@@ -149,7 +149,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
     std::cout<<"[sendPeptideResults] <"<<sock.id()<<"> Recv solutions <"<<size<<"> for AnalyseMgf of pk <"<<id<<">"<<std::endl;
 
     auto& pep = AnalysePeptide::get(id);
-    pep->is_done = true;
+    pep->status = 1;
 
     for(unsigned int i=0;i<size;++i)
     {
