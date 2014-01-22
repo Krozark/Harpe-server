@@ -1,9 +1,16 @@
 #ifndef FUNCTION_HPP
 #define FUNCTION_HPP
 
+#include <Socket/Config.hpp>
 #include <Socket/SocketSerialized.hpp>
 
+#define WEBSITE_HOST 1
+#define WEBSITE_PORT 2
+#define SERVER_PORT 3
+#define CLIENT_PORT 4
+
 class AnalysePeptide;
+
 
 /**
  * \brief Define the functions ids
@@ -26,6 +33,7 @@ enum ERRORS {
     EMPTY_DATA_SEND = 4,
     TIMEOUT = 5
 };
+
 
 /**
  * \brief init the deque of peptite to analyse that have been save in the DB, but not analysed
@@ -53,5 +61,41 @@ void clientWaitForWork(ntw::SocketSerialized& sock);
  * \param pk the analyseMgf pk
  */
 void sendPeptideResults(ntw::SocketSerialized& sock,int id);
+
+
+/******************************************************
+ ******************** REGISTER ***********************
+ *****************************************************/
+
+namespace ntw {
+    namespace srv {
+        class Server;
+        class Client;
+    }
+}
+
+/***
+ * \brief Register the server to the website interface
+ */
+int register_to_website(char host[],int port,char name[]);
+
+
+/**
+ * \brief Unregister the server to the website interface
+ */
+int unregister_to_website(char host[],int port,char name[]);
+
+
+bool get_register_server(int pk, char name[]);
+
+/**
+ * \brief call back on new client recv
+ */
+void register_client(ntw::srv::Server& self,ntw::srv::Client& client);
+
+/**
+ * \brief call back on delete client
+ */
+void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client);
 
 #endif

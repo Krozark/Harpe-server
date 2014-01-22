@@ -1,6 +1,4 @@
-
 #include <server/functions.hpp>
-
 
 #include <server/defines.hpp>
 #include <server/models.hpp>
@@ -17,13 +15,13 @@
 #include <memory>
 
 #include <chrono>
-#include <thread>
 #include <mutex>
-#include <chrono>
 #include <thread>
 
 std::mutex peptides_mutex;
 std::deque<std::shared_ptr<AnalysePeptide>> peptides;
+
+
 
 int init_deque_peptide()
 {
@@ -109,6 +107,8 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     }
     peptides_mutex.unlock();
     
+    
+
     return size;
 }
 
@@ -193,3 +193,170 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 }
 
 
+/******************************************************************
+ * ******************* REGISTER **********************************
+ * ***************************************************************/
+
+#include <Socket/server/Client.hpp>
+
+orm::Cache<HarpeServer>::type_ptr orm_server;
+
+int register_to_website(char host[],int port,char name[])
+{
+    int status = 0;
+
+    std::cout<<"[Loggin to website] "<<host<<":"<<port<<std::endl;
+    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
+    website_sock.connect(host,port);
+    std::string msg;
+    msg += std::string("GET /register/?name=");
+    msg += name;
+    msg += "&port=";
+    msg += std::to_string(ntw::Config::port_server);
+    msg +=" ";
+    msg += "HTTP/1.1\r\nHOST: ";
+    msg += host;
+    msg += "\r\n\r\n";
+
+    char buffer[1024];
+    website_sock.send(msg.c_str(),msg.size());
+
+    int recv;
+    float version = 0;
+    while((recv = website_sock.receive(buffer,1024))>0)
+    {
+        //std::cout.write(buffer,recv);
+        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+    }
+    //std::cout<<std::endl<<std::flush;
+
+    if(version > 0)
+    {
+        std::cout<<"Status : "<<status<<std::endl;
+        switch (status)
+        {
+            case 200 :///ok
+                {
+                }break;
+            case 211 : /// no name (set in code)
+                {
+                }break;
+            case 212 :/// no port (set in code)
+                {
+                }break;
+            case 213 :///unknow ip
+                {
+                }break;
+            case 214 :/// no object find
+                {
+                }break;
+            default:///?
+                {
+                }break;
+        }
+    }
+    return status;
+}
+
+
+int unregister_to_website(char host[],int port,char name[])
+{
+    int status = 0;
+
+    std::cout<<"[Unloggin to website] "<<host<<":"<<port<<std::endl;
+    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
+    website_sock.connect(host,port);
+    std::string msg;
+    msg += std::string("GET /unregister/?name=");
+    msg += name;
+    msg += "&port=";
+    msg += std::to_string(ntw::Config::port_server);
+    msg +=" ";
+    msg += "HTTP/1.1\r\nHOST: ";
+    msg += host;
+    msg += "\r\n\r\n";
+
+    char buffer[1024];
+    website_sock.send(msg.c_str(),msg.size());
+
+    int recv;
+    float version = 0;
+    while((recv = website_sock.receive(buffer,1024))>0)
+    {
+        //std::cout.write(buffer,recv);
+        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+    }
+    //std::cout<<std::endl<<std::flush;
+
+    if(version > 0)
+    {
+        std::cout<<"Status : "<<status<<std::endl;
+        switch (status)
+        {
+            case 200 :///ok
+                {
+                }break;
+            case 211 : /// no name (set in code)
+                {
+                }break;
+            case 212 :/// no port (set in code)
+                {
+                }break;
+            case 213 :///unknow ip
+                {
+                }break;
+            case 214 :/// no object find
+                {
+                }break;
+            default:///?
+                {
+                }break;
+        }
+    }
+    return status;
+}
+
+bool get_register_server(int pk,char name[])
+{
+    HarpeServer::query()\
+        .filter(true,"exact",HarpeServer::_is_active)\
+        .filter(name,"exact",HarpeServer::_name)\
+        .get(*orm_server);
+
+    if(orm_server->getPk()<=0)
+        return false;
+
+    return true;
+}
+
+void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
+{
+    Client cli;
+
+    Client::query()\
+        .filter(client.sock().getIp(),"exact",Client::_ip)\
+        .filter(client.sock().getPort(),"exact",Client::_port)\
+        .get(cli);
+
+    cli.ip = client.sock().getIp();
+    cli.port = client.sock().getPort();
+    cli.server = orm_server;
+    cli.is_active = true;
+
+    cli.save();
+    std::cout<<"Client added"<<std::endl;
+}
+
+
+void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
+{
+    Client cli;
+    Client::query()\
+        .filter(client.sock().getIp(),"exact",Client::_ip)\
+        .filter(client.sock().getPort(),"exact",Client::_port)\
+        .get(cli);
+    cli.is_active = false;
+    cli.save();
+
+    std::cout<<"Client delete"<<std::endl;
+}

@@ -11,130 +11,6 @@ orm::Bdd& orm::Bdd::Default = def;
 
 #include <server/functions.hpp>
 
-#define WEBSITE_HOST 1
-#define WEBSITE_PORT 2
-#define SERVER_PORT 3
-#define CLIENT_PORT 4
-
-/***
- * \brief Register the server to the website interface
- */
-int register_to_website(char host[],int port,char name[])
-{
-    int status = 0;
-
-    std::cout<<"[Loggin to website] "<<host<<":"<<port<<std::endl;
-    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
-    website_sock.connect(host,port);
-    std::string msg;
-    msg += std::string("GET /register/?name=");
-    msg += name;
-    msg += "&port=";
-    msg += std::to_string(ntw::Config::port_server);
-    msg +=" ";
-    msg += "HTTP/1.1\r\nHOST: ";
-    msg += host;
-    msg += "\r\n\r\n";
-
-    char buffer[1024];
-    website_sock.send(msg.c_str(),msg.size());
-
-    int recv;
-    float version = 0;
-    while((recv = website_sock.receive(buffer,1024))>0)
-    {
-        //std::cout.write(buffer,recv);
-        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
-    }
-    //std::cout<<std::endl<<std::flush;
-
-    if(version > 0)
-    {
-        std::cout<<"Status : "<<status<<std::endl;
-        switch (status)
-        {
-            case 200 :///ok
-                {
-                }break;
-            case 211 : /// no name (set in code)
-                {
-                }break;
-            case 212 :/// no port (set in code)
-                {
-                }break;
-            case 213 :///unknow ip
-                {
-                }break;
-            case 214 :/// no object find
-                {
-                }break;
-            default:///?
-                {
-                }break;
-        }
-    }
-    return status;
-}
-
-/**
- * \brief Unregister the server to the website interface
- */
-int unregister_to_website(char host[],int port,char name[])
-{
-    int status = 0;
-
-    std::cout<<"[Unloggin to website] "<<host<<":"<<port<<std::endl;
-    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
-    website_sock.connect(host,port);
-    std::string msg;
-    msg += std::string("GET /unregister/?name=");
-    msg += name;
-    msg += "&port=";
-    msg += std::to_string(ntw::Config::port_server);
-    msg +=" ";
-    msg += "HTTP/1.1\r\nHOST: ";
-    msg += host;
-    msg += "\r\n\r\n";
-
-    char buffer[1024];
-    website_sock.send(msg.c_str(),msg.size());
-
-    int recv;
-    float version = 0;
-    while((recv = website_sock.receive(buffer,1024))>0)
-    {
-        //std::cout.write(buffer,recv);
-        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
-    }
-    //std::cout<<std::endl<<std::flush;
-
-    if(version > 0)
-    {
-        std::cout<<"Status : "<<status<<std::endl;
-        switch (status)
-        {
-            case 200 :///ok
-                {
-                }break;
-            case 211 : /// no name (set in code)
-                {
-                }break;
-            case 212 :/// no port (set in code)
-                {
-                }break;
-            case 213 :///unknow ip
-                {
-                }break;
-            case 214 :/// no object find
-                {
-                }break;
-            default:///?
-                {
-                }break;
-        }
-    }
-    return status;
-}
 
 ntw::srv::Server* server = nullptr;
 
@@ -195,16 +71,26 @@ int main(int argc,char* argv[])
 
         std::signal(SIGINT, stop_server_handler);
 
-        server = new ntw::srv::Server(max_client);
+        try
+        {
+            server = new ntw::srv::Server(max_client);
+            server->on_new_client = register_client;
+            server->on_delete_client = unregister_client;
 
-        server->start();
-        server->wait();
+            server->start();
+            server->wait();
+        }
+        catch(ntw::SocketExeption& e)
+        {
+            std::cout<<e.what()<<std::endl;
+        }
+
 
         std::cout<<"Server is close"<<std::endl;
         orm::Bdd::Default.disconnect();
-        ///unregister from the website
-        unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     }
+    ///unregister from the website
+    unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     std::cout<<"Good bye"<<std::endl;
     return return_code;
 }

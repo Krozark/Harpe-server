@@ -7,6 +7,11 @@
 
 #include <Socket/Serializer.hpp>
 
+
+/*************************************
+ ********** STORE DATAS **************
+ ************************************/
+
 /**
  * \brief The AA class.
  * Use to connect with the DB
@@ -125,6 +130,50 @@ class CalculatedPeptide : public orm::SQLObject<CalculatedPeptide>
         orm::FK<AnalysePeptide,false> analyse;
 
         MAKE_STATIC_COLUMN(score,sequence,analyse);
+};
+
+/******************************************
+ ************** COMMUNICATION *************
+ ******************************************/
+
+class HarpeServer : public orm::SQLObject<HarpeServer>
+{
+    public:
+        HarpeServer();
+        orm::CharField<255> name;
+        orm::CharField<15>  ip;
+        orm::IntegerField   port;
+        orm::BooleanField   is_active;
+
+        MAKE_STATIC_COLUMN(name,ip,port,is_active);
+};
+
+class Client : public orm::SQLObject<Client>
+{
+    public:
+        Client();
+
+        orm::CharField<15>  ip;
+        orm::IntegerField   port;
+        //user
+        orm::FK<HarpeServer,false>  server;
+        orm::BooleanField   is_active;
+
+        MAKE_STATIC_COLUMN(ip,port,server,is_active);
+};
+
+class ClientCalculation : public orm::SQLObject<ClientCalculation>
+{
+    public:
+        ClientCalculation();
+
+        orm::FK<Client,false>   client;
+        orm::FK<AnalysePeptide,false>   analysepeptide;
+        orm::IntegerField   status;//STATES  = [(1,u"Envoyé"),(2,u"Reçu"),(3,u"Déconnecté")]
+        //send_houre      = models.DateTimeField(_("Envoyé à"))
+        //recive_houre    = models.DateTimeField(_("Reçu à"))
+
+        MAKE_STATIC_COLUMN(client,analysepeptide,status);
 };
 
 #include <deque>
