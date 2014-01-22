@@ -7,6 +7,8 @@ orm::Bdd& orm::Bdd::Default = def;
 #include <Socket/Config.hpp>
 #include <stdio.h>
 
+#include <csignal>
+
 #include <server/functions.hpp>
 
 #define WEBSITE_HOST 1
@@ -134,6 +136,18 @@ int unregister_to_website(char host[],int port,char name[])
     return status;
 }
 
+ntw::srv::Server* server = nullptr;
+
+/**
+ * \brief Signal hnadler to stop the server
+ * proprey
+ */
+void stop_server_handler(int sig)
+{
+    std::cout<<"Recv signal "<<sig<<". Stoping server.\n Please wait."<<std::endl;
+    if(server)
+        server->stop();
+}
 /**
  *  \brief The main function who start the server
  */
@@ -179,14 +193,18 @@ int main(int argc,char* argv[])
             <<"\n\twebsite port : "<<argv[WEBSITE_PORT]
             <<std::endl;
 
+        std::signal(SIGINT, stop_server_handler);
 
-        ntw::srv::Server server(max_client);
-        server.start();
-        server.wait();
+        server = new ntw::srv::Server(max_client);
 
+        server->start();
+        server->wait();
+
+        std::cout<<"Server is close"<<std::endl;
         orm::Bdd::Default.disconnect();
         ///unregister from the website
         unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     }
+    std::cout<<"Good bye"<<std::endl;
     return return_code;
 }
