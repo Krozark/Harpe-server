@@ -31,12 +31,12 @@ REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"scor
  *********************************************************/
 
 /************** Server ***************/
-REGISTER_AND_CONSTRUCT(HarpeServer,"website_harpeserver",name,"name",ip,"ip",port,"port",is_active,"is_active");
+REGISTER_AND_CONSTRUCT(HarpeServer,"communication_harpeserver",name,"name",ip,"ip",port,"port",is_active,"is_active");
 
 
 /*************** Client ***************/
-REGISTER_AND_CONSTRUCT(Client,"website_client",ip,"ip",port,"port",server,"server_id",is_active,"is_active");
+REGISTER_AND_CONSTRUCT(Client,"communication_client",ip,"ip",port,"port",server,"server_id",is_active,"is_active");
 
 /*************** M2M Client->AnalysePeptide *************/
-REGISTER_AND_CONSTRUCT(ClientCalculation,"website_clientcalculation",client,"client_id",analysepeptide,"analysepeptide_id",status,"status");
+REGISTER_AND_CONSTRUCT(ClientCalculation,"communication_clientcalculation",client,"client_id",analysepeptide,"analysepeptide_id",status,"status");
 

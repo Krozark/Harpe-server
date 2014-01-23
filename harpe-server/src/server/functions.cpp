@@ -126,6 +126,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             peptides.pop_front();
             peptides_mutex.unlock();
             std::string part = pep->mgf_part;
+            //TODO : save to DB the client -> pep link
             
             sock<<*pep;
             std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
@@ -201,7 +202,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
 orm::Cache<HarpeServer>::type_ptr orm_server;
 
-int register_to_website(char host[],int port,char name[])
+int register_to_website(char host[],int port,const std::string& name)
 {
     int status = 0;
 
@@ -259,7 +260,7 @@ int register_to_website(char host[],int port,char name[])
 }
 
 
-int unregister_to_website(char host[],int port,char name[])
+int unregister_to_website(char host[],int port,const std::string& name)
 {
     int status = 0;
 
@@ -316,11 +317,13 @@ int unregister_to_website(char host[],int port,char name[])
     return status;
 }
 
-bool get_register_server(int pk,char name[])
+bool get_register_server(const std::string& name)
 {
+    orm_server.reset(new HarpeServer);
+
     HarpeServer::query()\
-        .filter(true,"exact",HarpeServer::_is_active)\
-        .filter(name,"exact",HarpeServer::_name)\
+        .filter(true,"exact",HarpeServer::_is_active)
+        .filter(name,"exact",HarpeServer::_name)
         .get(*orm_server);
 
     if(orm_server->getPk()<=0)

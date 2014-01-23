@@ -77,16 +77,16 @@ namespace ntw {
 /***
  * \brief Register the server to the website interface
  */
-int register_to_website(char host[],int port,char name[]);
+int register_to_website(char host[],int port,const std::string& name);
 
 
 /**
  * \brief Unregister the server to the website interface
  */
-int unregister_to_website(char host[],int port,char name[]);
+int unregister_to_website(char host[],int port,const std::string& name);
 
 
-bool get_register_server(int pk, char name[]);
+bool get_register_server(const std::string& name);
 
 /**
  * \brief call back on new client recv

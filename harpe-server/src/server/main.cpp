@@ -60,34 +60,41 @@ int main(int argc,char* argv[])
     {
         /// inti database
         orm::Bdd::Default.connect();
-        init_deque_peptide();
-
-        std::cout<<"[Server start] on:"
-            <<"\n\tPort : "<<ntw::Config::port_server
-            <<"\n\tclient port : "<<ntw::Config::port_client
-            <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
-            <<"\n\twebsite port : "<<argv[WEBSITE_PORT]
-            <<std::endl;
-
-        std::signal(SIGINT, stop_server_handler);
-
-        try
+        if(get_register_server("Lyre"))
         {
-            server = new ntw::srv::Server(max_client);
-            server->on_new_client = register_client;
-            server->on_delete_client = unregister_client;
+            init_deque_peptide();
 
-            server->start();
-            server->wait();
+            std::cout<<"[Server start] on:"
+                <<"\n\tPort : "<<ntw::Config::port_server
+                <<"\n\tclient port : "<<ntw::Config::port_client
+                <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
+                <<"\n\twebsite port : "<<argv[WEBSITE_PORT]
+                <<std::endl;
+
+            std::signal(SIGINT, stop_server_handler);
+
+            try
+            {
+                server = new ntw::srv::Server(max_client);
+                server->on_new_client = register_client;
+                server->on_delete_client = unregister_client;
+
+                server->start();
+                server->wait();
+            }
+            catch(ntw::SocketExeption& e)
+            {
+                std::cout<<e.what()<<std::endl;
+            }
+
+
+            std::cout<<"Server is close"<<std::endl;
+            orm::Bdd::Default.disconnect();
         }
-        catch(ntw::SocketExeption& e)
+        else
         {
-            std::cout<<e.what()<<std::endl;
+            std::cerr<<"Error whene get server info fron the DB"<<std::endl;
         }
-
-
-        std::cout<<"Server is close"<<std::endl;
-        orm::Bdd::Default.disconnect();
     }
     ///unregister from the website
     unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
