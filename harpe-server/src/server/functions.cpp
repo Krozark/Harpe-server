@@ -51,7 +51,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     ///découpage
     std::istringstream stream(file_data);
     mgf::Driver driver(stream);
-    mgf::Analyse analyse = driver.parse();
+    mgf::Analyse analyse = driver.parse(~mgf::Spectrum::PrepareFlags::AddSpecialsPeaks); //not add special peaks, to not have theme twice, and not store theme in the BD
 
     //is a valid MGF format
     if (not driver.isValid())
