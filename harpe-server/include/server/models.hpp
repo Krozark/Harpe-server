@@ -76,7 +76,7 @@ class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
 
         friend ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalyseMgf& self)
         {
-            auto aas = self.AAs.all();
+            auto aas = self.AAs.all(*AA::default_connection);
             stream<<self.pk
                 <<(unsigned int)aas.size();
             for(auto& aa_ptr: aas)

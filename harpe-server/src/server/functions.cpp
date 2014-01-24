@@ -72,13 +72,20 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     }
 
     ///get the analyse from bdd
-    auto& bdd_analyse = AnalyseMgf::get(mgf_pk);
+    orm::Bdd& con = *AnalyseMgf::default_connection->clone();//a new connection
+    con.connect();
+
+    auto& bdd_analyse = AnalyseMgf::get(mgf_pk,con);
     std::cout<<"AnalyseMgf pk="<<mgf_pk<<" : "<<*bdd_analyse<<std::endl;
 
     if( not bdd_analyse)
     {
         LOG(sock,"analyse","PK_ERROR");
         sock.setStatus(ERRORS::PK_ERROR);
+
+        con.disconnect();
+        delete &con;
+
         return 0;
     }
     
@@ -103,11 +110,12 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
 
         pep->status = 0;
 
-        pep->save();
+        pep->save(con);
     }
     peptides_mutex.unlock();
     
-    
+    con.disconnect();
+    delete &con;   
 
     return size;
 }
@@ -149,7 +157,10 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
     sock>>size;
     std::cout<<"[sendPeptideResults] <"<<sock.id()<<"> Recv solutions <"<<size<<"> for AnalyseMgf of pk <"<<id<<">"<<std::endl;
 
-    auto& pep = AnalysePeptide::get(id);
+    orm::Bdd& con = *AnalysePeptide::default_connection->clone();//a new connection
+    con.connect();
+
+    auto& pep = AnalysePeptide::get(id,con);
     pep->status = 1;
 
     for(unsigned int i=0;i<size;++i)
@@ -182,10 +193,13 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
             if(j<seq_size-1)
                 result.sequence+=",";
         }
-        result.save();
+        result.save(con);
     }
 
-    pep->save();
+    pep->save(con);
+
+    con.disconnect();
+    delete &con;
 
     sock.clear();
     sock.setStatus(ntw::FuncWrapper::Status::ok);
@@ -336,7 +350,10 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
     Client cli;
 
-    Client::query()\
+    orm::Bdd& con = *Client::default_connection->clone();//a new connection
+    con.connect();
+
+    Client::query(con)\
         .filter(client.sock().getIp(),"exact",Client::_ip)\
         .filter(client.sock().getPort(),"exact",Client::_port)\
         .get(cli);
@@ -346,7 +363,11 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
     cli.server = orm_server;
     cli.is_active = true;
 
-    cli.save();
+    cli.save(con);
+
+    con.disconnect();
+    delete &con;
+
     std::cout<<"Client added"<<std::endl;
 }
 
@@ -354,12 +375,19 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
 void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
     Client cli;
-    Client::query()\
+
+    orm::Bdd& con = *Client::default_connection->clone();//a new connection
+    con.connect();
+
+    Client::query(con)\
         .filter(client.sock().getIp(),"exact",Client::_ip)\
         .filter(client.sock().getPort(),"exact",Client::_port)\
         .get(cli);
     cli.is_active = false;
-    cli.save();
+    cli.save(con);
+
+    con.disconnect();
+    delete &con;
 
     std::cout<<"Client delete"<<std::endl;
 }

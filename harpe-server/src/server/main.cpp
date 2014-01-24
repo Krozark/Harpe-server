@@ -95,9 +95,10 @@ int main(int argc,char* argv[])
         {
             std::cerr<<"Error whene get server info fron the DB"<<std::endl;
         }
+
+        unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     }
     ///unregister from the website
-    unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     std::cout<<"Good bye"<<std::endl;
     return return_code;
 }
