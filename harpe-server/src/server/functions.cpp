@@ -6,9 +6,7 @@
 #include <mgf/Driver.hpp>
 #include <mgf/Convert.hpp>
 
-
 #include <Socket/FuncWrapper.hpp>
-
 
 #include <sstream>
 #include <deque>
