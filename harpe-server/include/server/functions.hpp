@@ -4,10 +4,11 @@
 #include <Socket/Config.hpp>
 #include <Socket/SocketSerialized.hpp>
 
-#define WEBSITE_HOST 1
-#define WEBSITE_PORT 2
-#define SERVER_PORT 3
-#define CLIENT_PORT 4
+#define SERVER_NAME 1
+#define WEBSITE_HOST 2
+#define WEBSITE_PORT 3
+#define SERVER_PORT 4
+#define CLIENT_PORT 5
 
 class AnalysePeptide;
 

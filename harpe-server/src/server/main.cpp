@@ -1,6 +1,10 @@
 ///data base
-#include <ORM/backends/Sqlite3.hpp>
-orm::Sqlite3Bdd def("../../Harpe-website/Harpe-website/dev.db");
+//#include <ORM/backends/Sqlite3.hpp>
+//orm::Sqlite3Bdd def("../../Harpe-website/Harpe-website/dev.db");
+
+#include <ORM/backends/MySql.hpp>
+orm::MySQLBdd def("root","root","Harpe");
+
 orm::Bdd& orm::Bdd::Default = def;
 
 #include <Socket/server/Server.hpp>
@@ -31,7 +35,7 @@ int main(int argc,char* argv[])
 {
     if(argc < SERVER_PORT)
     {
-        std::cout<<"Usage are: "<<argv[0]<<" <website-host> <website-port> [server-port] [client-port]"<<std::endl;
+        std::cout<<"Usage are: "<<argv[0]<<" <server name> <website-host> <website-port>[server-port] [client-port]"<<std::endl;
         return 1;
     }
     
@@ -54,13 +58,13 @@ int main(int argc,char* argv[])
     const unsigned int max_client = 100;
 
     ///register from the website
-    int return_code = register_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
+    int return_code = register_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
 
     if(return_code == 200)
     {
         /// inti database
         orm::Bdd::Default.connect();
-        if(get_register_server("Lyre"))
+        if(get_register_server(argv[SERVER_NAME]))
         {
             init_deque_peptide();
 
@@ -96,8 +100,8 @@ int main(int argc,char* argv[])
             std::cerr<<"Error whene get server info fron the DB"<<std::endl;
         }
 
-        unregister_to_website(argv[WEBSITE_HOST],website_port,"Lyre");
     }
+    unregister_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
     ///unregister from the website
     std::cout<<"Good bye"<<std::endl;
     return return_code;

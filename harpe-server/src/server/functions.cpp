@@ -74,9 +74,9 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     ///get the analyse from bdd
     orm::Bdd& con = *AnalyseMgf::default_connection->clone();//a new connection
     con.connect();
+    con.threadInit();
 
     auto& bdd_analyse = AnalyseMgf::get(mgf_pk,con);
-    std::cout<<"AnalyseMgf pk="<<mgf_pk<<" : "<<*bdd_analyse<<std::endl;
 
     if( not bdd_analyse)
     {
@@ -84,13 +84,15 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         sock.setStatus(ERRORS::PK_ERROR);
 
         con.disconnect();
+        con.threadEnd();
         delete &con;
 
         return 0;
     }
-    
+
     ///\todo save in bdd
     const std::list<mgf::Spectrum*>& spectrums = analyse.getSpectrums();
+    con.beginTransaction();
    
     peptides_mutex.lock();
     for(mgf::Spectrum* spectrum : spectrums)
@@ -114,8 +116,11 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     }
     peptides_mutex.unlock();
     
+    con.endTransaction();
+    con.threadEnd();
     con.disconnect();
     delete &con;   
+
 
     return size;
 }
@@ -159,6 +164,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
     orm::Bdd& con = *AnalysePeptide::default_connection->clone();//a new connection
     con.connect();
+    con.threadInit();
 
     auto& pep = AnalysePeptide::get(id,con);
     pep->status = 1;
@@ -198,6 +204,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
     pep->save(con);
 
+    con.threadEnd();
     con.disconnect();
     delete &con;
 
@@ -348,7 +355,7 @@ bool get_register_server(const std::string& name)
 
 void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
-    Client cli;
+    /*Client cli;
 
     orm::Bdd& con = *Client::default_connection->clone();//a new connection
     con.connect();
@@ -368,13 +375,13 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
     con.disconnect();
     delete &con;
 
-    std::cout<<"Client added"<<std::endl;
+    std::cout<<"Client added"<<std::endl;*/
 }
 
 
 void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
-    Client cli;
+    /*Client cli;
 
     orm::Bdd& con = *Client::default_connection->clone();//a new connection
     con.connect();
@@ -389,5 +396,5 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
     con.disconnect();
     delete &con;
 
-    std::cout<<"Client delete"<<std::endl;
+    std::cout<<"Client delete"<<std::endl;*/
 }
