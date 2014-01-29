@@ -31,6 +31,7 @@ int init_deque_peptide()
         .get(results);
 
     std::cout<<"[init_deque_peptide] "<<results.size()<<" peptides to calc"<<std::endl;
+
     for(auto& i : results)
     {
         peptides.emplace_back(std::move(i));
