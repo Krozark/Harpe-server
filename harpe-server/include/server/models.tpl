@@ -19,18 +19,30 @@ REGISTER_AND_CONSTRUCT(AAModification,"website_aamodification",name,"name",delta
 
 ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModification& self)
 {
+
+    //AAModificationPosition
+    std::list<orm::Cache<AAModificationPosition>::type_ptr> aamodificationposition;
+    AAModificationPosition::query()\
+        .filter(self.pk,"exact",AAModificationPosition::_modification)\
+        .get(aamodificationposition);
+
     stream<<self.pk
-        <<self.delta;
+        <<self.delta
+        <<(unsigned int)aamodificationposition.size();
+
+    for (auto& aamod : aamodificationposition)
+        stream<<*aamod;
+
     return stream;
 }
 
 /***************** AA Modification Position *********************/
 REGISTER_AND_CONSTRUCT(AAModificationPosition,"website_aamodificationposition",aa,"AA_id",modification,"modification_id",position,"position");
 
-ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModificationPosition& self)
+ntw::Serializer& operator<<(ntw::Serializer& stream,AAModificationPosition& self)
 {
     stream<<self.pk
-        <<self.aa.getFk()
+        <<*self.aa
         //<<self.modification
         <<self.position;
     return stream;
@@ -53,19 +65,23 @@ AnalyseMgf::AnalyseMgf() : mgf(AnalyseMgf::_mgf), enzyme(AnalyseMgf::_enzyme), A
 
 ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalyseMgf& self)
 {
+    stream<<self.pk;
     // AAs
-    auto aas = self.AAs.all();
-    stream<<self.pk
-        <<(unsigned int)aas.size();
-    for(auto& aa_ptr: aas)
-        stream<<*aa_ptr;
+    {
+        auto aas = self.AAs.all();
+        stream<<(unsigned int)aas.size();
+        for(auto& aa_ptr: aas)
+            stream<<*aa_ptr;
+    }
 
     //modifications PTMs
-    auto modifications = self.modifications.all();
-    //stream<<(unsigned int)modifications.size();
-    for(auto& mod : modifications)
-        //stream<<*mod;
-        std::cout<<mod<<std::endl;
+    {
+        auto modifications = self.modifications.all();
+        stream<<(unsigned int)modifications.size();
+
+        for(auto& mod : modifications)
+            stream<<*mod;
+    }
 
     return stream;
 }

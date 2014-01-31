@@ -56,7 +56,7 @@ class AAModificationPosition : public orm::SQLObject<AAModificationPosition>
 
         MAKE_STATIC_COLUMN(aa,modification,position);
 
-        friend ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModificationPosition& self);
+        friend ntw::Serializer& operator<<(ntw::Serializer& stream, AAModificationPosition& self);
 
 };
 
