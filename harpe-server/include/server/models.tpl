@@ -30,7 +30,7 @@ REGISTER_AND_CONSTRUCT(AAModificationPosition,"website_aamodificationposition",a
 ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModificationPosition& self)
 {
     stream<<self.pk
-        //<<self.AA
+        <<self.aa.getFk()
         //<<self.modification
         <<self.position;
     return stream;
@@ -53,11 +53,20 @@ AnalyseMgf::AnalyseMgf() : mgf(AnalyseMgf::_mgf), enzyme(AnalyseMgf::_enzyme), A
 
 ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalyseMgf& self)
 {
-    auto aas = self.AAs.all(*AA::default_connection);
+    // AAs
+    auto aas = self.AAs.all();
     stream<<self.pk
         <<(unsigned int)aas.size();
     for(auto& aa_ptr: aas)
         stream<<*aa_ptr;
+
+    //modifications PTMs
+    auto modifications = self.modifications.all();
+    //stream<<(unsigned int)modifications.size();
+    for(auto& mod : modifications)
+        //stream<<*mod;
+        std::cout<<mod<<std::endl;
+
     return stream;
 }
 
