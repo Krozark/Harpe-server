@@ -191,9 +191,9 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
             }
             else //AA token
             {
-                int pk;
-                sock>>pk;
-                result.sequence+=std::to_string(pk);
+                int pk,mod_pk;
+                sock>>pk>>mod_pk;
+                result.sequence+=std::to_string(pk)+":"+std::to_string(mod_pk);
             }
             is_peak= not is_peak; 
             if(j<seq_size-1)
