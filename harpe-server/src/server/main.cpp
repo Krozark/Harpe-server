@@ -3,7 +3,7 @@
 //orm::Sqlite3Bdd def("../../Harpe-website/Harpe-website/dev.db");
 
 #include <ORM/backends/MySql.hpp>
-orm::MySQLBdd def("root","root","Harpe");
+orm::MySqlBdd def("root","root","Harpe");
 
 orm::Bdd& orm::Bdd::Default = def;
 

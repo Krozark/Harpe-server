@@ -3,7 +3,7 @@
 
 #include <ORM/fields.hpp>
 #include <ORM/fields/ManyToMany.hpp>
-#include <ORM/models/SQLObject.hpp>
+#include <ORM/models/SqlObject.hpp>
 
 #include <Socket/Serializer.hpp>
 
@@ -16,7 +16,7 @@
  * \brief The AA class.
  * Use to connect with the DB
  */
-class AA : public orm::SQLObject<AA>
+class AA : public orm::SqlObject<AA>
 {
     public:
         AA();
@@ -43,7 +43,7 @@ class AA : public orm::SQLObject<AA>
     first = models.ForeignKey(AA,related_name="first")
     second = models.ForeignKey(AA,related_name="second")*/
 
-class Enzyme : public orm::SQLObject<Enzyme>
+class Enzyme : public orm::SqlObject<Enzyme>
 {
     public : 
         Enzyme();
@@ -58,7 +58,7 @@ class Enzyme : public orm::SQLObject<Enzyme>
         MAKE_STATIC_COLUMN(name);
 };
 
-class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
+class AnalyseMgf : public orm::SqlObject<AnalyseMgf>
 {
     public:
         AnalyseMgf();
@@ -86,7 +86,7 @@ class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
 
 };
 
-class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
+class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
 {
     public :
         AnalysePeptide();
@@ -116,7 +116,7 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
         }
 };
 
-class CalculatedPeptide : public orm::SQLObject<CalculatedPeptide>
+class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
 {
     public:
         CalculatedPeptide();
@@ -136,7 +136,7 @@ class CalculatedPeptide : public orm::SQLObject<CalculatedPeptide>
  ************** COMMUNICATION *************
  ******************************************/
 
-class HarpeServer : public orm::SQLObject<HarpeServer>
+class HarpeServer : public orm::SqlObject<HarpeServer>
 {
     public:
         HarpeServer();
@@ -148,7 +148,7 @@ class HarpeServer : public orm::SQLObject<HarpeServer>
         MAKE_STATIC_COLUMN(name,ip,port,is_active);
 };
 
-class Client : public orm::SQLObject<Client>
+class Client : public orm::SqlObject<Client>
 {
     public:
         Client();
@@ -162,7 +162,7 @@ class Client : public orm::SQLObject<Client>
         MAKE_STATIC_COLUMN(ip,port,server,is_active);
 };
 
-class ClientCalculation : public orm::SQLObject<ClientCalculation>
+class ClientCalculation : public orm::SqlObject<ClientCalculation>
 {
     public:
         ClientCalculation();
