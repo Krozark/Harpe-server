@@ -61,7 +61,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock);
  * \brief recv result from client
  * \param pk the analyseMgf pk
  */
-void sendPeptideResults(ntw::SocketSerialized& sock,int id);
+void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status);
 
 
 /******************************************************

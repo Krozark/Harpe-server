@@ -31,6 +31,7 @@ int init_deque_peptide()
         .get(results);
 
     std::cout<<"[init_deque_peptide] "<<results.size()<<" peptides to calc"<<std::endl;
+
     for(auto& i : results)
     {
         peptides.emplace_back(std::move(i));
@@ -72,7 +73,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     ///get the analyse from bdd
     orm::Bdd& con = *AnalyseMgf::default_connection->clone();//a new connection
     con.connect();
-    con.threadInit();
+    //con.threadInit();
 
     auto& bdd_analyse = AnalyseMgf::get(mgf_pk,con);
 
@@ -101,8 +102,10 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         pep->analyse = bdd_analyse;
         pep->name = spectrum->getHeader().getTitle();
         pep->mz = spectrum->getHeader().getMz();
-        pep->intensity = spectrum->getHeader().getIntensity();
         pep->charge = spectrum->getHeader().getCharge();
+        pep->mass = spectrum->getMass();
+        //pep->mass = mgf::Convert::mz_to_mass(pep->mz,pep->charge);
+        pep->intensity = spectrum->getHeader().getIntensity();
 
         std::stringstream stream;
         stream<<*spectrum;
@@ -154,7 +157,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
     sock.setStatus(ERRORS::TIMEOUT);
 }
 
-void sendPeptideResults(ntw::SocketSerialized& sock,int id)
+void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 {
     unsigned int size = 0;
     sock>>size;
@@ -162,10 +165,11 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
     orm::Bdd& con = *AnalysePeptide::default_connection->clone();//a new connection
     con.connect();
-    con.threadInit();
+    con.beginTransaction();
+    //con.threadInit();
 
     auto& pep = AnalysePeptide::get(id,con);
-    pep->status = 1;
+    pep->status = status;
 
     for(unsigned int i=0;i<size;++i)
     {
@@ -189,9 +193,9 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
             }
             else //AA token
             {
-                int pk;
-                sock>>pk;
-                result.sequence+=std::to_string(pk);
+                int pk,mod_pk;
+                sock>>pk>>mod_pk;
+                result.sequence+=std::to_string(pk)+":"+std::to_string(mod_pk);
             }
             is_peak= not is_peak; 
             if(j<seq_size-1)
@@ -202,6 +206,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
 
     pep->save(con);
 
+    con.endTransaction();
     con.threadEnd();
     con.disconnect();
     delete &con;

@@ -26,9 +26,9 @@ namespace ntw
             }break;
             case FUNCTION_ID::SEND_PEPTIDE_RESULTS : 
             {
-                int pk;
-                request>>pk;
-                sendPeptideResults(request,pk);
+                int pk,status;
+                request>>pk>>status;
+                sendPeptideResults(request,pk,status);
                 res = request.getStatus();
 
             }break;
