@@ -88,7 +88,7 @@ ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalyseMgf& self)
 
 
 /********************** AnalysePeptide ******************************/
-REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",status,"status");
+REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",status,"status");
 
 ntw::Serializer& operator<<(ntw::Serializer& stream,AnalysePeptide& self)
 {

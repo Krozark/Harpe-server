@@ -3,7 +3,7 @@
 
 #include <ORM/fields.hpp>
 #include <ORM/fields/ManyToMany.hpp>
-#include <ORM/models/SQLObject.hpp>
+#include <ORM/models/SqlObject.hpp>
 
 #include <Socket/Serializer.hpp>
 
@@ -16,7 +16,7 @@
  * \brief The AA class.
  * Use to connect with the DB
  */
-class AA : public orm::SQLObject<AA>
+class AA : public orm::SqlObject<AA>
 {
     public:
         AA();
@@ -29,7 +29,7 @@ class AA : public orm::SQLObject<AA>
         friend ntw::Serializer& operator<<(ntw::Serializer& stream,const AA& self);
 };
 
-class AAModification : public orm::SQLObject<AAModification>
+class AAModification : public orm::SqlObject<AAModification>
 {
     public:
         AAModification();
@@ -43,7 +43,7 @@ class AAModification : public orm::SQLObject<AAModification>
         friend ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModification& self);
 };
 
-class AAModificationPosition : public orm::SQLObject<AAModificationPosition>
+class AAModificationPosition : public orm::SqlObject<AAModificationPosition>
 {
     /*CHOICES = ((1,"partout"),(2,"N-term"),(3,"C-term")*/
 
@@ -64,7 +64,7 @@ class AAModificationPosition : public orm::SQLObject<AAModificationPosition>
     first = models.ForeignKey(AA,related_name="first")
     second = models.ForeignKey(AA,related_name="second")*/
 
-class Enzyme : public orm::SQLObject<Enzyme>
+class Enzyme : public orm::SqlObject<Enzyme>
 {
     public : 
         Enzyme();
@@ -79,7 +79,7 @@ class Enzyme : public orm::SQLObject<Enzyme>
         MAKE_STATIC_COLUMN(name);
 };
 
-class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
+class AnalyseMgf : public orm::SqlObject<AnalyseMgf>
 {
     public:
         AnalyseMgf();
@@ -100,7 +100,7 @@ class AnalyseMgf : public orm::SQLObject<AnalyseMgf>
 
 };
 
-class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
+class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
 {
     public :
         AnalysePeptide();
@@ -113,18 +113,19 @@ class AnalysePeptide : public orm::SQLObject<AnalysePeptide>
         orm::FK<AnalyseMgf,false>   analyse;
         orm::CharField<255>         name;
         orm::DoubleField            mz;
+        orm::DoubleField            mass;
         orm::IntegerField           intensity;
         orm::IntegerField           charge;
         orm::TextField              mgf_part;
         orm::IntegerField           status;
 
-        MAKE_STATIC_COLUMN(analyse,name,mz,intensity,charge,mgf_part,status);
+        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,status);
 
 
         friend ntw::Serializer& operator<<(ntw::Serializer& stream,AnalysePeptide& self);
 };
 
-class CalculatedPeptide : public orm::SQLObject<CalculatedPeptide>
+class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
 {
     public:
         CalculatedPeptide();
@@ -144,7 +145,7 @@ class CalculatedPeptide : public orm::SQLObject<CalculatedPeptide>
  ************** COMMUNICATION *************
  ******************************************/
 
-class HarpeServer : public orm::SQLObject<HarpeServer>
+class HarpeServer : public orm::SqlObject<HarpeServer>
 {
     public:
         HarpeServer();
@@ -156,7 +157,7 @@ class HarpeServer : public orm::SQLObject<HarpeServer>
         MAKE_STATIC_COLUMN(name,ip,port,is_active);
 };
 
-class Client : public orm::SQLObject<Client>
+class Client : public orm::SqlObject<Client>
 {
     public:
         Client();
@@ -170,7 +171,7 @@ class Client : public orm::SQLObject<Client>
         MAKE_STATIC_COLUMN(ip,port,server,is_active);
 };
 
-class ClientCalculation : public orm::SQLObject<ClientCalculation>
+class ClientCalculation : public orm::SqlObject<ClientCalculation>
 {
     public:
         ClientCalculation();

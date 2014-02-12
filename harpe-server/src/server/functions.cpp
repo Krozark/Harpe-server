@@ -102,8 +102,10 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         pep->analyse = bdd_analyse;
         pep->name = spectrum->getHeader().getTitle();
         pep->mz = spectrum->getHeader().getMz();
-        pep->intensity = spectrum->getHeader().getIntensity();
         pep->charge = spectrum->getHeader().getCharge();
+        pep->mass = spectrum->getMass();
+        //pep->mass = mgf::Convert::mz_to_mass(pep->mz,pep->charge);
+        pep->intensity = spectrum->getHeader().getIntensity();
 
         std::stringstream stream;
         stream<<*spectrum;
@@ -155,7 +157,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
     sock.setStatus(ERRORS::TIMEOUT);
 }
 
-void sendPeptideResults(ntw::SocketSerialized& sock,int id)
+void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 {
     unsigned int size = 0;
     sock>>size;
@@ -167,7 +169,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id)
     //con.threadInit();
 
     auto& pep = AnalysePeptide::get(id,con);
-    pep->status = 1;
+    pep->status = status;
 
     for(unsigned int i=0;i<size;++i)
     {
