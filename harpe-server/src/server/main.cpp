@@ -15,6 +15,8 @@ orm::Bdd& orm::Bdd::Default = def;
 
 #include <server/functions.hpp>
 
+#include <ORM/core/Tables.hpp>
+
 
 ntw::srv::Server* server = nullptr;
 
@@ -59,6 +61,7 @@ int main(int argc,char* argv[])
 
     ///register from the website
     int return_code = register_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
+
 
     if(return_code == 200)
     {
