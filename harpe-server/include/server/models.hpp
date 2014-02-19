@@ -138,7 +138,30 @@ class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
         orm::TextField                  sequence;
         orm::FK<AnalysePeptide,false>   analyse;
 
-        MAKE_STATIC_COLUMN(score,sequence,analyse);
+        orm::DoubleField                error_total;
+        orm::DoubleField                error_aa_cumul; ///< les erreur + et - se compensnt pas
+        orm::DoubleField                intensitee_total_parent;///< intensitée total des intensitées
+        orm::DoubleField                intensitee_total; ///< intensitée totale qui est utilisée
+        orm::DoubleField                mass_total;///< somme des mass des aa
+        orm::DoubleField                percent_couverture;///< mass_total /100 * mass_parent 
+        orm::DoubleField                nb_aa; ///< nombre de aa dans la chaine
+        orm::DoubleField                nb_peaks; ///< nombre de peaks dasn la chaine
+        orm::DoubleField                mass_parent; ///< mass du peptide
+        orm::DoubleField                percent_intensitee_utilisee;///< intensitee_total /100 * intensitee_total_parent  
+
+        MAKE_STATIC_COLUMN(score,\
+                           sequence,\
+                           analyse,\
+                           error_total,\
+                           error_aa_cumul,\
+                           intensitee_total_parent,\
+                           intensitee_total,\
+                           mass_total,\
+                           percent_couverture,\
+                           nb_aa,\
+                           nb_peaks,\
+                           mass_parent,\
+                           percent_intensitee_utilisee);
 };
 
 /******************************************

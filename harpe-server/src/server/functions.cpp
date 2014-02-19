@@ -7,6 +7,7 @@
 #include <mgf/Convert.hpp>
 
 #include <Socket/FuncWrapper.hpp>
+#include <harpe-algo/Sequence.hpp>
 
 #include <sstream>
 #include <deque>
@@ -175,12 +176,30 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
     {
         double score;
         unsigned int seq_size;
-        sock>>score //score of the solution
-            >>seq_size; //size of the sequence
+        sock>>score;
+
+        double stats[harpe::Sequence::Stats::SIZE];
+
+        for(unsigned int j=0;j<harpe::Sequence::Stats::SIZE;++j)
+            sock>>stats[j];
+        //score of the solution
+        sock>>seq_size; //size of the sequence
 
         CalculatedPeptide result;
-        result.analyse = pep;
-        result.score = score;
+
+        result.analyse                  = pep;
+        result.score                    = score;
+
+        result.error_total              = stats[harpe::Sequence::Stats::ERROR_TOTAL];
+        result.error_aa_cumul           = stats[harpe::Sequence::Stats::ERROR_AA_CUMUL];
+        result.intensitee_total_parent  = stats[harpe::Sequence::Stats::INTENSITEE_TOTAL_PARENT];
+        result.intensitee_total         = stats[harpe::Sequence::Stats::INTENSITEE_TOTAL];
+        result.mass_total               = stats[harpe::Sequence::Stats::MASS_TOTAL];
+        result.percent_couverture       = stats[harpe::Sequence::Stats::PERCENT_COUVERTURE];
+        result.nb_aa                    = stats[harpe::Sequence::Stats::NB_AA];
+        result.nb_peaks                 = stats[harpe::Sequence::Stats::NB_PEAKS];
+        result.mass_parent              = stats[harpe::Sequence::Stats::MASS_PARENT];
+        result.percent_intensitee_utilisee = stats[harpe::Sequence::Stats::PERCENT_INTENSITEE_UTILISEE];
 
         bool is_peak = true;
         for(unsigned int j=0;j<seq_size;++j)

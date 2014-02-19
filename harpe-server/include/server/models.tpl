@@ -99,7 +99,19 @@ ntw::Serializer& operator<<(ntw::Serializer& stream,AnalysePeptide& self)
 }
 
 /******************** CalculatedPeptide *****************************/
-REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"score",sequence,"sequence",analyse,"analyse_id");
+REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"score",\
+                       sequence,"sequence",\
+                       analyse,"analyse_id",\
+                       error_total,"error_total",\
+                       error_aa_cumul,"error_aa_cumul",\
+                       intensitee_total_parent,"intensitee_total_parent",\
+                       intensitee_total,"intensitee_total",
+                       mass_total,"mass_total",\
+                       percent_couverture,"percent_couverture",\
+                       nb_aa,"nb_aa",\
+                       nb_peaks,"nb_peaks",\
+                       mass_parent,"mass_parent",\
+                       percent_intensitee_utilisee,"percent_intensitee_utilisee");
 
 /**********************************************************
  ******************** COMMUNICATION ***********************
