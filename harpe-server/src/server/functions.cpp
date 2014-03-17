@@ -37,6 +37,7 @@ int init_deque_peptide()
     {
         peptides.emplace_back(std::move(i));
     }
+    return peptides.size();
 }
 
 int getVersion(ntw::SocketSerialized& sock)

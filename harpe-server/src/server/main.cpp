@@ -88,6 +88,7 @@ int main(int argc,char* argv[])
 
                 server->start();
                 server->wait();
+                delete server;
             }
             catch(ntw::SocketExeption& e)
             {
