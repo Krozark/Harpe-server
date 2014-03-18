@@ -212,5 +212,5 @@ class ClientCalculation : public orm::SqlObject<ClientCalculation>
 extern std::deque<std::shared_ptr<AnalysePeptide>> peptides;
 
 
-#include <server/models.tpl>
+#include <harpe-server/models.tpl>
 #endif

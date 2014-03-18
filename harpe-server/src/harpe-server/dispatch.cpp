@@ -1,8 +1,8 @@
-#include <server/dispatch.hpp>
+#include <harpe-server/dispatch.hpp>
 
 #include <Socket/FuncWrapper.hpp>
 
-#include <server/functions.hpp>
+#include <harpe-server/functions.hpp>
 
 namespace ntw
 {

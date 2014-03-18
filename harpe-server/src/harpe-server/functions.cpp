@@ -1,7 +1,6 @@
-#include <server/functions.hpp>
-
-#include <server/defines.hpp>
-#include <server/models.hpp>
+#include <harpe-server/functions.hpp>
+#include <harpe-server/defines.hpp>
+#include <harpe-server/models.hpp>
 
 #include <mgf/Driver.hpp>
 #include <mgf/Convert.hpp>

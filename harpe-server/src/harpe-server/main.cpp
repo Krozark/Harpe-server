@@ -13,7 +13,8 @@ orm::Bdd& orm::Bdd::Default = def;
 
 #include <csignal>
 
-#include <server/functions.hpp>
+#include <harpe-server/functions.hpp>
+#include <harpe-server/defines.hpp>
 
 #include <ORM/core/Tables.hpp>
 
@@ -35,6 +36,7 @@ void stop_server_handler(int sig)
  */
 int main(int argc,char* argv[])
 {
+    std::cout<<"===\nHarpe server\nversion:"<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"\n===\n"<<std::endl;
     if(argc < SERVER_PORT)
     {
         std::cout<<"Usage are: "<<argv[0]<<" <server name> <website-host> <website-port>[server-port] [client-port]"<<std::endl;
@@ -104,9 +106,9 @@ int main(int argc,char* argv[])
             std::cerr<<"Error whene get server info fron the DB"<<std::endl;
         }
 
+        ///unregister from the website
+        unregister_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
     }
-    unregister_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
-    ///unregister from the website
     std::cout<<"Good bye"<<std::endl;
     return return_code;
 }
