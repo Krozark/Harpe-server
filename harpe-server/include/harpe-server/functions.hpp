@@ -68,6 +68,9 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status);
  ******************** REGISTER ***********************
  *****************************************************/
 
+/**
+ * \brief define some external class
+ */
 namespace ntw {
     namespace srv {
         class Server;
