@@ -1,6 +1,8 @@
 set(INCROOT ${PROJECT_SOURCE_DIR}/include/${CMAKE_PROJECT_NAME})
 set(SRCROOT ${PROJECT_SOURCE_DIR}/src/${CMAKE_PROJECT_NAME})
 
+configure_file(${INCROOT}/defines.hpp.in ${INCROOT}/defines.hpp @ONLY)
+
 #ROOT files
 set(ROOT_SRC
     ${SRCROOT}/dispatch.cpp
