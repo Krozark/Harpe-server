@@ -1,0 +1,14 @@
+# File generated with gen-requirement
+#Soft : harpe-server
+
+MyPackage==0.4.0
+
+libsocket==0.2
+liborm==0.3
+libmysqlcppconn==5
+libsqlite3==0
+libmgf==0.1
+libpthread==0
+libstdc++==6
+libgcc_s==1
+libc==6
