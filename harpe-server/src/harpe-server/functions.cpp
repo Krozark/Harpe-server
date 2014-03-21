@@ -264,6 +264,8 @@ int register_to_website(char host[],int port,const std::string& name)
     msg += name;
     msg += "&port=";
     msg += std::to_string(ntw::Config::port_server);
+    msg += "&version=";
+    msg += std::to_string(VERSION);
     msg +=" ";
     msg += "HTTP/1.1\r\nHOST: ";
     msg += host;
