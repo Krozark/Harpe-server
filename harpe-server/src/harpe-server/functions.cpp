@@ -20,7 +20,6 @@ std::mutex peptides_mutex;
 std::deque<std::shared_ptr<AnalysePeptide>> peptides;
 
 
-
 int init_deque_peptide()
 {
     std::list<orm::Cache<AnalysePeptide>::type_ptr> results;    
@@ -132,6 +131,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
     int time = 1*60*1000; //min * secondes * millisecondes
     constexpr int delta = 500; //milisecondes
 
+
     while(time>0)
     {
         peptides_mutex.lock();
@@ -143,8 +143,15 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             std::string part = pep->mgf_part;
             //TODO : save to DB the client -> pep link
             
-            sock<<*pep;
+            orm::Bdd& con = *AnalysePeptide::default_connection->clone();//a new connection
+            con.connect();
+            
+            pep->serialize(sock,con);
             std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
+
+            con.threadEnd();
+            con.disconnect();
+            delete &con;   
 
             return;
         }

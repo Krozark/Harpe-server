@@ -6,32 +6,31 @@
 REGISTER_AND_CONSTRUCT(AA,"website_aa",slug,"slug",mass,"mass");
 
 
-ntw::Serializer& operator<<(ntw::Serializer& stream,const AA& self)
+ntw::Serializer& AA::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {
-    stream<<self.pk
-        <<self.slug
-        <<self.mass;
+    stream<<this->pk
+        <<this->slug
+        <<this->mass;
     return stream;
 }
 
 /*************** AA Modification ***********************************/
 REGISTER_AND_CONSTRUCT(AAModification,"website_aamodification",name,"name",delta,"delta");
 
-ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModification& self)
+ntw::Serializer& AAModification::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {
-
     //AAModificationPosition
     std::list<orm::Cache<AAModificationPosition>::type_ptr> aamodificationposition;
-    AAModificationPosition::query()\
-        .filter(self.pk,"exact",AAModificationPosition::_modification)\
+    AAModificationPosition::query(bdd)\
+        .filter(this->pk,"exact",AAModificationPosition::_modification)\
         .get(aamodificationposition);
 
-    stream<<self.pk
-        <<self.delta
+    stream<<this->pk
+        <<this->delta
         <<(unsigned int)aamodificationposition.size();
 
     for (auto& aamod : aamodificationposition)
-        stream<<*aamod;
+        aamod->serialize(stream,bdd);
 
     return stream;
 }
@@ -39,12 +38,12 @@ ntw::Serializer& operator<<(ntw::Serializer& stream,const AAModification& self)
 /***************** AA Modification Position *********************/
 REGISTER_AND_CONSTRUCT(AAModificationPosition,"website_aamodificationposition",aa,"AA_id",modification,"modification_id",position,"position");
 
-ntw::Serializer& operator<<(ntw::Serializer& stream,AAModificationPosition& self)
+ntw::Serializer& AAModificationPosition::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {
-    stream<<self.pk
-        <<*self.aa
+    stream<<this->pk;
+    this->aa->serialize(stream,bdd);
         //<<self.modification
-        <<self.position;
+    stream<<this->position;
     return stream;
 }
 
@@ -63,24 +62,24 @@ AnalyseMgf::AnalyseMgf() : mgf(AnalyseMgf::_mgf), enzyme(AnalyseMgf::_enzyme), A
     enzyme.registerAttr(*this);
 }
 
-ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalyseMgf& self)
+ntw::Serializer& AnalyseMgf::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {
-    stream<<self.pk;
+    stream<<this->pk;
     // AAs
     {
-        auto aas = self.AAs.all();
+        auto aas = this->AAs.all(bdd);
         stream<<(unsigned int)aas.size();
         for(auto& aa_ptr: aas)
-            stream<<*aa_ptr;
+            aa_ptr->serialize(stream,bdd);
     }
 
     //modifications PTMs
     {
-        auto modifications = self.modifications.all();
+        auto modifications = this->modifications.all(bdd);
         stream<<(unsigned int)modifications.size();
 
         for(auto& mod : modifications)
-            stream<<*mod;
+            mod->serialize(stream,bdd);
     }
 
     return stream;
@@ -90,12 +89,11 @@ ntw::Serializer& operator<<(ntw::Serializer& stream,const AnalyseMgf& self)
 /********************** AnalysePeptide ******************************/
 REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",status,"status");
 
-ntw::Serializer& operator<<(ntw::Serializer& stream,AnalysePeptide& self)
+ntw::Serializer& AnalysePeptide::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {
-    stream<<self.pk
-        <<self.mgf_part
-        <<*(self.analyse);
-    return stream;
+    stream<<this->pk
+        <<this->mgf_part;
+    return this->analyse->serialize(stream,bdd);
 }
 
 /******************** CalculatedPeptide *****************************/
