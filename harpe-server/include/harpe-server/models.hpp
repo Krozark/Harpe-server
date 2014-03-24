@@ -101,12 +101,14 @@ class AnalyseMgf : public orm::SqlObject<AnalyseMgf>
         //
         orm::FK<Enzyme,true>                        enzyme; ///< the enzyme used (optional)
         orm::CharField<255>                         mgf; ///< the path of the mgf file
+        orm::IntegerField                           max_charge;
+        orm::FloatField                             error;
         //descriptif
         //created
         orm::ManyToMany<AnalyseMgf,AA>              AAs; ///< the AAs used for this analyse
         orm::ManyToMany<AnalyseMgf,AAModification>  modifications; ///< the post trductional modification
         
-        MAKE_STATIC_COLUMN(mgf,enzyme);
+        MAKE_STATIC_COLUMN(mgf,enzyme,max_charge,error);
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
 

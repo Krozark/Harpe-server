@@ -55,16 +55,20 @@ REGISTER_AND_CONSTRUCT(Enzyme,"website_enzyme",name,"name");
 //REGISTER_AND_CONSTRUCT(AnalyseMgf,"website_analysemgf",mgf,"mgf");
 M2M_REGISTER(AnalyseMgf,AAs,AA,"website_analysemgf_AAs","analysemgf_id","aa_id")
 M2M_REGISTER(AnalyseMgf,modification,AAModification,"website_analysemgf_modifications","analysemgf_id","aamodification_id")
-REGISTER(AnalyseMgf,"website_analysemgf",mgf,"mgf",enzyme,"enzyme_id")
-AnalyseMgf::AnalyseMgf() : mgf(AnalyseMgf::_mgf), enzyme(AnalyseMgf::_enzyme), AAs(*this), modifications(*this)
+REGISTER(AnalyseMgf,"website_analysemgf",enzyme,"enzyme_id",mgf,"mgf",max_charge,"max_charge",error,"error")
+AnalyseMgf::AnalyseMgf() : enzyme(AnalyseMgf::_enzyme),mgf(AnalyseMgf::_mgf),max_charge(AnalyseMgf::_max_charge),error(AnalyseMgf::_error),AAs(*this), modifications(*this)
 {
-    mgf.registerAttr(*this);
     enzyme.registerAttr(*this);
+    mgf.registerAttr(*this);
+    max_charge.registerAttr(*this);
+    error.registerAttr(*this);
 }
 
 ntw::Serializer& AnalyseMgf::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {
-    stream<<this->pk;
+    stream<<this->pk
+        <<this->max_charge
+        <<this->error;
     // AAs
     {
         auto aas = this->AAs.all(bdd);
