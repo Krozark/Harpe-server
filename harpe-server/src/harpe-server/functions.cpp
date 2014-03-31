@@ -369,6 +369,39 @@ int unregister_to_website(char host[],int port,const std::string& name)
     return status;
 }
 
+int dispatch(int id,ntw::SocketSerialized& request)
+{
+    int res= ntw::FuncWrapper::Status::st::wrong_id;
+    std::cout<<"[dispatch] id:"<<id<<std::endl<<std::flush;
+    switch(id)
+    {
+        case FUNCTION_ID::GET_VERSION:
+        {
+            res = ntw::FuncWrapper::srv::exec(getVersion,request);
+        }break;
+        case FUNCTION_ID::ANALYSE:
+        {
+            res = ntw::FuncWrapper::srv::exec(analyse,request);
+        }break;
+        case FUNCTION_ID::CLIENT_WAIT_FOR_WORK :
+        {
+            res = ntw::FuncWrapper::srv::exec(clientWaitForWork,request);
+        }break;
+        case FUNCTION_ID::SEND_PEPTIDE_RESULTS : 
+        {
+            int pk,status;
+            request>>pk>>status;
+            sendPeptideResults(request,pk,status);
+            res = request.getStatus();
+
+        }break;
+        default:
+        break;
+    }
+    return res;
+}
+
+
 bool get_register_server(const std::string& name)
 {
     orm_server.reset(new HarpeServer);

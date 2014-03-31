@@ -61,6 +61,8 @@ int main(int argc,char* argv[])
     ntw::Config::broadcast = false;
     const unsigned int max_client = 100;
 
+    ntw::Socket::init(dispatch);
+
     ///register from the website
     int return_code = register_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
 
@@ -110,5 +112,8 @@ int main(int argc,char* argv[])
         unregister_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
     }
     std::cout<<"Good bye"<<std::endl;
+
+    ntw::Socket::close();
+
     return return_code;
 }

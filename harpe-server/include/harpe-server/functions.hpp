@@ -37,6 +37,14 @@ enum ERRORS {
 
 
 /**
+ * \brief Define the dispatch function
+ * A simple switch on the id, and call the function
+ * of this id
+ */
+ int dispatch(int id,ntw::SocketSerialized& request);
+
+
+/**
  * \brief init the deque of peptite to analyse that have been save in the DB, but not analysed
  */
 int init_deque_peptide();

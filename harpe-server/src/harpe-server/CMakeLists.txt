@@ -5,12 +5,10 @@ configure_file(${INCROOT}/defines.hpp.in ${INCROOT}/defines.hpp @ONLY)
 
 #ROOT files
 set(ROOT_SRC
-    ${SRCROOT}/dispatch.cpp
     ${SRCROOT}/functions.cpp
 )
 set(ROOT_HEADER
     ${INCROOT}/defines.hpp
-    ${INCROOT}/dispatch.hpp
     ${INCROOT}/functions.hpp
     ${INCROOT}/models.hpp
     ${INCROOT}/models.tpl
@@ -27,8 +25,6 @@ set(FILES_HEADER
 set(FILES_SRC
     ${ROOT_SRC}
 )
-
-find_library(LIBS ${LIBS})
 
 add_executable(${CMAKE_PROJECT_NAME} main.cpp ${FILES_HEADER} ${FILES_SRC})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${LIBS})
