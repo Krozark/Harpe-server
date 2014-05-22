@@ -6,12 +6,12 @@ configure_file(${INCROOT}/defines.hpp.in ${INCROOT}/defines.hpp @ONLY)
 #ROOT files
 set(ROOT_SRC
     ${SRCROOT}/functions.cpp
+    ${SRCROOT}/models.cpp
 )
 set(ROOT_HEADER
     ${INCROOT}/defines.hpp
     ${INCROOT}/functions.hpp
     ${INCROOT}/models.hpp
-    ${INCROOT}/models.tpl
 )
 set(ROOT_FILES
     ${ROOT_HEADER}

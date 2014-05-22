@@ -238,7 +238,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
     delete &con;
 
     sock.clear();
-    sock.setStatus(ntw::FuncWrapper::Status::ok);
+    sock.setStatus(ntw::Status::ok);
     std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
     sock.sendCl();
 }
@@ -252,18 +252,18 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 
 orm::Cache<HarpeServer>::type_ptr orm_server;
 
-int register_to_website(char host[],int port,const std::string& name)
+int register_to_website(int port_server,char host[],int port,const std::string& name)
 {
     int status = 0;
 
     std::cout<<"[Loggin to website] "<<host<<":"<<port<<std::endl;
-    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
+    ntw::Socket website_sock(ntw::Socket::Domain::IP,ntw::Socket::Type::TCP);
     website_sock.connect(host,port);
     std::string msg;
     msg += std::string("GET /register/?name=");
     msg += name;
     msg += "&port=";
-    msg += std::to_string(ntw::Config::port_server);
+    msg += port_server;
     msg += "&version=";
     msg += std::to_string(VERSION);
     msg +=" ";
@@ -312,18 +312,18 @@ int register_to_website(char host[],int port,const std::string& name)
 }
 
 
-int unregister_to_website(char host[],int port,const std::string& name)
+int unregister_to_website(int port_server,char host[],int port,const std::string& name)
 {
     int status = 0;
 
     std::cout<<"[Unloggin to website] "<<host<<":"<<port<<std::endl;
-    ntw::Socket website_sock(ntw::Socket::Dommaine::IP,ntw::Socket::Type::TCP);
+    ntw::Socket website_sock(ntw::Socket::Domain::IP,ntw::Socket::Type::TCP);
     website_sock.connect(host,port);
     std::string msg;
     msg += std::string("GET /unregister/?name=");
     msg += name;
     msg += "&port=";
-    msg += std::to_string(ntw::Config::port_server);
+    msg += std::to_string(port_server);
     msg +=" ";
     msg += "HTTP/1.1\r\nHOST: ";
     msg += host;
@@ -371,7 +371,7 @@ int unregister_to_website(char host[],int port,const std::string& name)
 
 int dispatch(int id,ntw::SocketSerialized& request)
 {
-    int res= ntw::FuncWrapper::Status::st::wrong_id;
+    int res= ntw::Status::wrong_id;
     std::cout<<"[dispatch] id:"<<id<<std::endl<<std::flush;
     switch(id)
     {

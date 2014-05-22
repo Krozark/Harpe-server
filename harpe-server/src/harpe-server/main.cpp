@@ -8,7 +8,6 @@ orm::MySqlBdd def("root","root","Harpe");
 orm::Bdd& orm::Bdd::Default = def;
 
 #include <Socket/server/Server.hpp>
-#include <Socket/Config.hpp>
 #include <stdio.h>
 
 #include <csignal>
@@ -46,25 +45,17 @@ int main(int argc,char* argv[])
     int website_port = atoi(argv[WEBSITE_PORT]);
 
     //// inti config
+    int port_server = 3987;
+    int port_client = 3988;
+
     if (argc >= SERVER_PORT+1)
-        ntw::Config::port_server = atoi(argv[SERVER_PORT]);
-    else
-        ntw::Config::port_server = 3987;
-
+        port_server = atoi(argv[SERVER_PORT]);
     if (argc >= CLIENT_PORT+1)
-        ntw::Config::port_client = atoi(argv[CLIENT_PORT]);
-    else
-        ntw::Config::port_client = 3988;
+        port_client = atoi(argv[CLIENT_PORT]);
 
-    ntw::Config::max_connexion = 10;
-    ntw::Config::default_timeout = 5.f;
-    ntw::Config::broadcast = false;
-    const unsigned int max_client = 100;
-
-    ntw::Socket::init(dispatch);
 
     ///register from the website
-    int return_code = register_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
+    int return_code = register_to_website(port_server,argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
 
 
     if(return_code == 200)
@@ -76,8 +67,8 @@ int main(int argc,char* argv[])
             init_deque_peptide();
 
             std::cout<<"[Server start] on:"
-                <<"\n\tPort : "<<ntw::Config::port_server
-                <<"\n\tclient port : "<<ntw::Config::port_client
+                <<"\n\tPort : "<<port_server
+                <<"\n\tclient port : "<<port_client
                 <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
                 <<"\n\twebsite port : "<<argv[WEBSITE_PORT]
                 <<std::endl;
@@ -86,7 +77,7 @@ int main(int argc,char* argv[])
 
             try
             {
-                server = new ntw::srv::Server(max_client);
+                server = new ntw::srv::Server(port_client,"",dispatch,100);
                 server->on_new_client = register_client;
                 server->on_delete_client = unregister_client;
 
@@ -109,7 +100,7 @@ int main(int argc,char* argv[])
         }
 
         ///unregister from the website
-        unregister_to_website(argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
+        unregister_to_website(port_server,argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
     }
     std::cout<<"Good bye"<<std::endl;
 

@@ -1,8 +1,8 @@
 #ifndef FUNCTION_HPP
 #define FUNCTION_HPP
 
-#include <Socket/Config.hpp>
 #include <Socket/SocketSerialized.hpp>
+#include <Socket/Status.hpp>
 
 #define SERVER_NAME 1
 #define WEBSITE_HOST 2
@@ -28,11 +28,11 @@ enum FUNCTION_ID
  * \brief Define the ERRORS values
  */
 enum ERRORS {
-    INPUT_NOT_VALID = 1,
-    EMPTY_INPUT = 2,
-    PK_ERROR = 3,
-    EMPTY_DATA_SEND = 4,
-    TIMEOUT = 5
+    INPUT_NOT_VALID = ntw::Status::user_define,
+    EMPTY_INPUT,
+    PK_ERROR,
+    EMPTY_DATA_SEND,
+    TIMEOUT
 };
 
 
@@ -89,13 +89,13 @@ namespace ntw {
 /***
  * \brief Register the server to the website interface
  */
-int register_to_website(char host[],int port,const std::string& name);
+int register_to_website(int port_server,char host[],int port,const std::string& name);
 
 
 /**
  * \brief Unregister the server to the website interface
  */
-int unregister_to_website(char host[],int port,const std::string& name);
+int unregister_to_website(int port_server,char host[],int port,const std::string& name);
 
 
 bool get_register_server(const std::string& name);
