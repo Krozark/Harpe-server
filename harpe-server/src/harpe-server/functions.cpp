@@ -94,6 +94,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
     con.beginTransaction();
    
     peptides_mutex.lock();
+    int i=1;
     for(mgf::Spectrum* spectrum : spectrums)
     {
         peptides.emplace_back(new AnalysePeptide);
@@ -110,9 +111,8 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         std::stringstream stream;
         stream<<*spectrum;
         pep->mgf_part = stream.str();
-
+        pep->cmpd = i++;
         pep->status = 0;
-
         pep->save(con);
     }
     peptides_mutex.unlock();
@@ -263,7 +263,7 @@ int register_to_website(int port_server,char host[],int port,const std::string& 
     msg += std::string("GET /register/?name=");
     msg += name;
     msg += "&port=";
-    msg += port_server;
+    msg += std::to_string(port_server);
     msg += "&version=";
     msg += std::to_string(VERSION);
     msg +=" ";

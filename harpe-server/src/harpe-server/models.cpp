@@ -92,7 +92,7 @@ ntw::Serializer& AnalyseMgf::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 
 
 /********************** AnalysePeptide ******************************/
-REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",status,"status");
+REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",cmpd,"cmpd",status,"status");
 
 ntw::Serializer& AnalysePeptide::serialize(ntw::Serializer& stream,orm::Bdd& bdd)
 {

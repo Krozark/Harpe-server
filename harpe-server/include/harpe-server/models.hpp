@@ -134,9 +134,10 @@ class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
         orm::IntegerField           intensity;///< his intensity
         orm::IntegerField           charge;///< his charge
         orm::TextField              mgf_part;///< the mgf part of this analyse
+        orm::IntegerField           cmpd;//< the compound number
         orm::IntegerField           status;///< the status of this analyse  CHOICES = (0,'-'),(1,u'calculé'),(2,u'timeout'),(3,u'out of memory')
 
-        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,status);
+        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status);
 
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
