@@ -38,7 +38,7 @@ int main(int argc,char* argv[])
     std::cout<<"===\nHarpe server\nversion:"<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"\n===\n"<<std::endl;
     if(argc < SERVER_PORT)
     {
-        std::cout<<"Usage are: "<<argv[0]<<" <server name> <website-host> <website-port>[server-port] [client-port]"<<std::endl;
+        std::cout<<"Usage are: "<<argv[0]<<" <server name> <website-host> <website-port>[server-port]"<<std::endl;
         return 1;
     }
     
@@ -46,12 +46,9 @@ int main(int argc,char* argv[])
 
     //// inti config
     int port_server = 3987;
-    int port_client = 3988;
 
     if (argc >= SERVER_PORT+1)
         port_server = atoi(argv[SERVER_PORT]);
-    if (argc >= CLIENT_PORT+1)
-        port_client = atoi(argv[CLIENT_PORT]);
 
 
     ///register from the website
@@ -68,7 +65,7 @@ int main(int argc,char* argv[])
 
             std::cout<<"[Server start] on:"
                 <<"\n\tPort : "<<port_server
-                <<"\n\tclient port : "<<port_client
+                //<<"\n\tclient port : "<<port_client
                 <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
                 <<"\n\twebsite port : "<<argv[WEBSITE_PORT]
                 <<std::endl;
@@ -77,7 +74,7 @@ int main(int argc,char* argv[])
 
             try
             {
-                server = new ntw::srv::Server(port_client,"",dispatch,100);
+                server = new ntw::srv::Server(port_server,"",dispatch,100);
                 server->on_new_client = register_client;
                 server->on_delete_client = unregister_client;
 

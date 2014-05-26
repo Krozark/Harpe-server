@@ -101,6 +101,16 @@ ntw::Serializer& AnalysePeptide::serialize(ntw::Serializer& stream,orm::Bdd& bdd
     return this->analyse->serialize(stream,bdd);
 }
 
+M2M_REGISTER(AnalysePeptideValidated,modifications,AAModification,"website_analysepeptidevalidated_modifications","Analysepeptidevalidate_id","aamodification_id")
+REGISTER(AnalysePeptideValidated,"website_analysepeptidevalidated",score,"score",analyse,"analyse_id",sequence,"sequence",modification_seq,"modification_seq")
+AnalysePeptideValidated::AnalysePeptideValidated() : score(AnalysePeptideValidated::_score), analyse(AnalysePeptideValidated::_analyse), sequence(AnalysePeptideValidated::_sequence), modification_seq(AnalysePeptideValidated::_modification_seq),modifications(*this)
+{
+    score.registerAttr(*this);
+    analyse.registerAttr(*this);
+    sequence.registerAttr(*this);
+    modification_seq.registerAttr(*this);
+}
+
 /******************** CalculatedPeptide *****************************/
 REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"score",\
                        sequence,"sequence",\

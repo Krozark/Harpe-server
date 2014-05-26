@@ -143,6 +143,21 @@ class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
 };
 
+class AnalysePeptideValidated : public orm::SqlObject<AnalysePeptideValidated>
+{
+    public:
+        AnalysePeptideValidated();
+
+        orm::DoubleField                        score;
+        orm::FK<AnalysePeptide,false>           analyse;
+        orm::TextField                          sequence;
+        orm::TextField                          modification_seq;
+
+        orm::ManyToMany<AnalysePeptideValidated,AAModification>  modifications;
+
+        MAKE_STATIC_COLUMN(score,analyse,sequence,modification_seq);
+};
+
 /**
  * \brief store a potential sequence for a peptide
  */

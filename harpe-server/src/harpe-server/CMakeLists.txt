@@ -28,3 +28,6 @@ set(FILES_SRC
 
 add_executable(${CMAKE_PROJECT_NAME} main.cpp ${FILES_HEADER} ${FILES_SRC})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${LIBS})
+
+add_executable(gen_mgfs gen_mgfs.cpp ${FILES_HEADER} ${FILES_SRC})
+target_link_libraries(gen_mgfs ${LIBS})
