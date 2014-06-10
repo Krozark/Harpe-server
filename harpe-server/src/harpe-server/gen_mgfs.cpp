@@ -21,10 +21,11 @@ orm::DB& orm::DB::Default = def;
 
 int main(int argc,char* argv[])
 {
-    std::string filename = "out";
+    std::string filename;
     if(argc > 2)
     {
         filename = argv[1];
+        filename+="-";
     }
     
     orm::DB::Default.connect();
@@ -33,7 +34,7 @@ int main(int argc,char* argv[])
     std::cout<<"Entrez le score minimale à tenir en compte\n>";
     std::cin>>score;
 
-    filename+="-"+std::to_string(score);
+    filename+=std::to_string(score);
 
     std::list<orm::Cache<AnalysePeptideValidated>::type_ptr> pep_validates;
     AnalysePeptideValidated::query()
