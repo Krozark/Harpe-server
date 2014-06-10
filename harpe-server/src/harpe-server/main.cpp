@@ -1,11 +1,11 @@
 ///data base
 //#include <ORM/backends/Sqlite3.hpp>
-//orm::Sqlite3Bdd def("../../Harpe-website/Harpe-website/dev.db");
+//orm::Sqlite3DB def("../../Harpe-website/Harpe-website/dev.db");
 
 #include <ORM/backends/MySql.hpp>
-orm::MySqlBdd def("root","toor","Harpe-website");
+orm::MySqlDB def("root","toor","Harpe-website");
 
-orm::Bdd& orm::Bdd::Default = def;
+orm::DB& orm::DB::Default = def;
 
 #include <Socket/server/Server.hpp>
 #include <stdio.h>
@@ -58,7 +58,7 @@ int main(int argc,char* argv[])
     if(return_code == 200)
     {
         /// inti database
-        orm::Bdd::Default.connect();
+        orm::DB::Default.connect();
         if(get_register_server(argv[SERVER_NAME]))
         {
             init_deque_peptide();
@@ -89,7 +89,7 @@ int main(int argc,char* argv[])
 
 
             std::cout<<"Server is close"<<std::endl;
-            orm::Bdd::Default.disconnect();
+            orm::DB::Default.disconnect();
         }
         else
         {

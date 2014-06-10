@@ -70,14 +70,14 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         return 0;
     }
 
-    ///get the analyse from bdd
-    orm::Bdd& con = *AnalyseMgf::default_connection->clone();//a new connection
+    ///get the analyse from db
+    orm::DB& con = *AnalyseMgf::default_connection->clone();//a new connection
     con.connect();
     //con.threadInit();
 
-    auto& bdd_analyse = AnalyseMgf::get(mgf_pk,con);
+    auto& db_analyse = AnalyseMgf::get(mgf_pk,con);
 
-    if( not bdd_analyse)
+    if( not db_analyse)
     {
         LOG(sock,"analyse","PK_ERROR");
         sock.setStatus(ERRORS::PK_ERROR);
@@ -89,7 +89,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         return 0;
     }
 
-    ///\todo save in bdd
+    ///\todo save in db
     const std::list<mgf::Spectrum*>& spectrums = analyse.getSpectrums();
     con.beginTransaction();
    
@@ -100,7 +100,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         peptides.emplace_back(new AnalysePeptide);
         std::shared_ptr<AnalysePeptide>& pep = peptides.back();
 
-        pep->analyse = bdd_analyse;
+        pep->analyse = db_analyse;
         pep->name = spectrum->getHeader().getTitle();
         pep->mz = spectrum->getHeader().getMz();
         pep->charge = spectrum->getHeader().getCharge();
@@ -113,7 +113,7 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         pep->mgf_part = stream.str();
         pep->cmpd = i++;
         pep->status = 0;
-        pep->save(con);
+        pep->save(true,con);
     }
     peptides_mutex.unlock();
     
@@ -143,7 +143,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             std::string part = pep->mgf_part;
             //TODO : save to DB the client -> pep link
             
-            orm::Bdd& con = *AnalysePeptide::default_connection->clone();//a new connection
+            orm::DB& con = *AnalysePeptide::default_connection->clone();//a new connection
             con.connect();
             
             pep->serialize(sock,con);
@@ -171,7 +171,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
     sock>>size;
     std::cout<<"[sendPeptideResults] <"<<sock.id()<<"> Recv solutions <"<<size<<"> for AnalyseMgf of pk <"<<id<<">"<<std::endl;
 
-    orm::Bdd& con = *AnalysePeptide::default_connection->clone();//a new connection
+    orm::DB& con = *AnalysePeptide::default_connection->clone();//a new connection
     con.connect();
     con.beginTransaction();
     //con.threadInit();
@@ -227,10 +227,10 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
             if(j<seq_size-1)
                 result.sequence+=",";
         }
-        result.save(con);
+        result.save(true,con);
     }
 
-    pep->save(con);
+    pep->save(true,con);
 
     con.endTransaction();
     con.threadEnd();
@@ -421,7 +421,7 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
     /*Client cli;
 
-    orm::Bdd& con = *Client::default_connection->clone();//a new connection
+    orm::DB& con = *Client::default_connection->clone();//a new connection
     con.connect();
 
     Client::query(con)\
@@ -447,7 +447,7 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
     /*Client cli;
 
-    orm::Bdd& con = *Client::default_connection->clone();//a new connection
+    orm::DB& con = *Client::default_connection->clone();//a new connection
     con.connect();
 
     Client::query(con)\

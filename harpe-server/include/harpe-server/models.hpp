@@ -26,7 +26,7 @@ class AA : public orm::SqlObject<AA>
 
         MAKE_STATIC_COLUMN(slug,mass);
 
-        ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
+        ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 };
 
 /**
@@ -43,7 +43,7 @@ class AAModification : public orm::SqlObject<AAModification>
 
         MAKE_STATIC_COLUMN(name,delta);
 
-        ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
+        ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 };
 
 /**
@@ -61,7 +61,7 @@ class AAModificationPosition : public orm::SqlObject<AAModificationPosition>
 
         MAKE_STATIC_COLUMN(aa,modification,position);
 
-        ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
+        ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 
 };
 
@@ -110,7 +110,7 @@ class AnalyseMgf : public orm::SqlObject<AnalyseMgf>
         
         MAKE_STATIC_COLUMN(mgf,enzyme,max_charge,error);
 
-        ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
+        ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 
 };
 
@@ -140,7 +140,7 @@ class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
         MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status);
 
 
-        ntw::Serializer& serialize(ntw::Serializer& stream,orm::Bdd& self);
+        ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 };
 
 class AnalysePeptideValidated : public orm::SqlObject<AnalysePeptideValidated>
