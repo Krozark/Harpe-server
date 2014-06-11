@@ -204,7 +204,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
         result.mass_total               = stats[harpe::Sequence::Stats::MASS_TOTAL];
         result.percent_couverture       = stats[harpe::Sequence::Stats::PERCENT_COUVERTURE];
         result.nb_aa                    = stats[harpe::Sequence::Stats::NB_AA];
-        result.nb_peaks                 = stats[harpe::Sequence::Stats::NB_PEAKS];
+        //result.nb_peaks                 = stats[harpe::Sequence::Stats::NB_PEAKS];
         result.mass_parent              = stats[harpe::Sequence::Stats::MASS_PARENT];
         result.percent_intensitee_utilisee = stats[harpe::Sequence::Stats::PERCENT_INTENSITEE_UTILISEE];
 

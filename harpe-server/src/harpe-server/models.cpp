@@ -122,7 +122,7 @@ REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"scor
                        mass_total,"mass_total",\
                        percent_couverture,"percent_couverture",\
                        nb_aa,"nb_aa",\
-                       nb_peaks,"nb_peaks",\
+                       //nb_peaks,"nb_peaks"
                        mass_parent,"mass_parent",\
                        percent_intensitee_utilisee,"percent_intensitee_utilisee");
 
