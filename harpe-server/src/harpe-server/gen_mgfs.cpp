@@ -17,8 +17,6 @@ orm::DB& orm::DB::Default = def;
 #include <sstream>
 #include <fstream>
 
-
-
 int main(int argc,char* argv[])
 {
     std::string filename;
@@ -33,14 +31,18 @@ int main(int argc,char* argv[])
     int score;
     std::cout<<"Entrez le score minimale à tenir en compte\n>";
     std::cin>>score;
+    int limit;
+    std::cout<<"Entrez le nombre de spectres maximals (-1 pour ignorer)\n>";
+    std::cin>>limit;
 
     filename+=std::to_string(score);
 
     std::list<orm::Cache<AnalysePeptideValidated>::type_ptr> pep_validates;
     AnalysePeptideValidated::query()
-    .filter(not orm::Q<AnalysePeptideValidated>(std::string(),orm::op::exact,AnalysePeptideValidated::_modification_seq) //no modifications
+    .filter(orm::Q<AnalysePeptideValidated>(std::string(),orm::op::exact,AnalysePeptideValidated::_modification_seq) //no modifications
             and orm::Q<AnalysePeptideValidated>(score,orm::op::gte,AnalysePeptideValidated::_score))
         .orderBy("?")
+        .limit(limit)
         .get(pep_validates);
 
     std::cout<<"Query return "<<pep_validates.size()<<" results."<<std::endl;
