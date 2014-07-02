@@ -114,6 +114,7 @@ AnalysePeptideValidated::AnalysePeptideValidated() : score(AnalysePeptideValidat
 /******************** CalculatedPeptide *****************************/
 REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"score",\
                        sequence,"sequence",\
+                       sequence_aa,"sequence_aa",\
                        analyse,"analyse_id",\
                        error_total,"error_total",\
                        error_aa_cumul,"error_aa_cumul",\

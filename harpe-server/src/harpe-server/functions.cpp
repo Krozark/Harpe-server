@@ -189,8 +189,6 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 
         for(unsigned int j=0;j<harpe::Sequence::Stats::SIZE;++j)
             sock>>stats[j];
-        //score of the solution
-        sock>>seq_size; //size of the sequence
 
         CalculatedPeptide result;
 
@@ -208,6 +206,8 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
         result.mass_parent              = stats[harpe::Sequence::Stats::MASS_PARENT];
         result.percent_intensitee_utilisee = stats[harpe::Sequence::Stats::PERCENT_INTENSITEE_UTILISEE];
 
+        //score of the solution
+        sock>>seq_size; //size of the sequence
         bool is_peak = true;
         for(unsigned int j=0;j<seq_size;++j)
         {
@@ -221,6 +221,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
             {
                 int pk,mod_pk;
                 sock>>pk>>mod_pk;
+                //TODO add sequence
                 result.sequence+=std::to_string(pk)+":"+std::to_string(mod_pk);
             }
             is_peak= not is_peak; 

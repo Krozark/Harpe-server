@@ -172,6 +172,8 @@ class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
 
         orm::DoubleField                score; ///< his score
         orm::TextField                  sequence;///< his sequence. format his double:int,int. the first double is a peak mass, and the pair(int,int) is a AA_pk and a AAModification_pk. AAModification_pk can be <= -1 for none.
+        orm::TextField                  sequence_aa;
+
         orm::FK<AnalysePeptide,false>   analyse;///< AnalysePeptide related to
 
         orm::DoubleField                error_total; ///< the sum of all the delta between theorical mass and experimental
@@ -187,6 +189,7 @@ class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
 
         MAKE_STATIC_COLUMN(score,\
                            sequence,\
+                           sequence_aa,\
                            analyse,\
                            error_total,\
                            error_aa_cumul,\
