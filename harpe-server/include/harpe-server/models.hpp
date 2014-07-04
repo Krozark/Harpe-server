@@ -137,7 +137,9 @@ class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
         orm::IntegerField           cmpd;//< the compound number
         orm::IntegerField           status;///< the status of this analyse  CHOICES = (0,'-'),(1,u'calculé'),(2,u'timeout'),(3,u'out of memory')
 
-        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status);
+        orm::BooleanField           ignore;//<true if not need to analyse
+
+        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status,ignore);
 
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);

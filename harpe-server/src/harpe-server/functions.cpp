@@ -15,6 +15,7 @@
 #include <chrono>
 #include <mutex>
 #include <thread>
+#include <ORM/backends/op.hpp>
 
 std::mutex peptides_mutex;
 std::deque<std::shared_ptr<AnalysePeptide>> peptides;
@@ -25,7 +26,8 @@ int init_deque_peptide()
     std::list<orm::Cache<AnalysePeptide>::type_ptr> results;    
 
     AnalysePeptide::query()\
-        .filter(0,"exact",AnalysePeptide::_status)\
+    .filter(orm::Q<AnalysePeptide>(0,orm::op::exact,AnalysePeptide::_status)
+            and orm::Q<AnalysePeptide>(false,orm::op::exact,AnalysePeptide::_ignore))\
         .orderBy("id")\
         .get(results);
 
