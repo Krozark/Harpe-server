@@ -28,20 +28,31 @@ int main(int argc,char* argv[])
     
     orm::DB::Default.connect();
 
-    int score;
-    std::cout<<"Entrez le score minimale à tenir en compte\n>";
-    std::cin>>score;
+    int score_min;
+    std::cout<<"Entrez le score minimale à tenir en compte (<=0 pour ignorer)\n>";
+    std::cin>>score_min;
+
+    int score_max;
+    std::cout<<"Entrez le score maximal à tenir en compte (<= 0 pour ignorer)\n>";
+    std::cin>>score_max;
+
     int limit;
     std::cout<<"Entrez le nombre de spectres maximals (-1 pour ignorer)\n>";
     std::cin>>limit;
 
-    filename+=std::to_string(score);
+    filename+=std::to_string(score_min)+"-"+std::to_string(score_max);
 
     std::list<orm::Cache<AnalysePeptideValidated>::type_ptr> pep_validates;
-    AnalysePeptideValidated::query()
-    .filter(orm::Q<AnalysePeptideValidated>(std::string(),orm::op::exact,AnalysePeptideValidated::_modification_seq) //no modifications
-            and orm::Q<AnalysePeptideValidated>(score,orm::op::gte,AnalysePeptideValidated::_score))
-        .orderBy("?")
+    auto q = AnalysePeptideValidated::query();
+    q.filter(orm::Q<AnalysePeptideValidated>(std::string(),orm::op::exact,AnalysePeptideValidated::_modification_seq)); //no modifications
+
+    if(score_min > 0)
+        q.filter(orm::Q<AnalysePeptideValidated>(score_min,orm::op::gt,AnalysePeptideValidated::_score));
+
+    if(score_max > 0)
+        q.filter(orm::Q<AnalysePeptideValidated>(score_min,orm::op::lte,AnalysePeptideValidated::_score));
+
+     q.orderBy("?")
         .limit(limit)
         .get(pep_validates);
 
@@ -55,7 +66,7 @@ int main(int argc,char* argv[])
     int max_learning = pep_validates.size()*0.70;
     int max_test = max_learning + pep_validates.size()*0.15;
 
-    std::cout<<"Add "<<max_learning<<" spectrums in learning, "<<max_test-max_learning<<" spectrums in test and "<< pep_validates.size()-max_test<<" in validation for score >="<<score<<std::endl;
+    std::cout<<"Add "<<max_learning<<" spectrums in learning, "<<max_test-max_learning<<" spectrums in test and "<< pep_validates.size()-max_test<<" in validation for score >"<<score_min<<" and score <= "<<score_max<<std::endl;
     for(auto& validated : pep_validates)
     {
         std::istringstream stream(validated->analyse->mgf_part);
