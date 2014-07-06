@@ -137,7 +137,9 @@ class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
         orm::IntegerField           cmpd;//< the compound number
         orm::IntegerField           status;///< the status of this analyse  CHOICES = (0,'-'),(1,u'calculé'),(2,u'timeout'),(3,u'out of memory')
 
-        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status);
+        orm::BooleanField           ignore;//<true if not need to analyse
+
+        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status,ignore);
 
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
@@ -172,6 +174,8 @@ class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
 
         orm::DoubleField                score; ///< his score
         orm::TextField                  sequence;///< his sequence. format his double:int,int. the first double is a peak mass, and the pair(int,int) is a AA_pk and a AAModification_pk. AAModification_pk can be <= -1 for none.
+        orm::TextField                  sequence_aa;
+
         orm::FK<AnalysePeptide,false>   analyse;///< AnalysePeptide related to
 
         orm::DoubleField                error_total; ///< the sum of all the delta between theorical mass and experimental
@@ -187,6 +191,7 @@ class CalculatedPeptide : public orm::SqlObject<CalculatedPeptide>
 
         MAKE_STATIC_COLUMN(score,\
                            sequence,\
+                           sequence_aa,\
                            analyse,\
                            error_total,\
                            error_aa_cumul,\

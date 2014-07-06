@@ -92,7 +92,7 @@ ntw::Serializer& AnalyseMgf::serialize(ntw::Serializer& stream,orm::DB& db)
 
 
 /********************** AnalysePeptide ******************************/
-REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",cmpd,"cmpd",status,"status");
+REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",cmpd,"cmpd",status,"status",ignore,"ignore");
 
 ntw::Serializer& AnalysePeptide::serialize(ntw::Serializer& stream,orm::DB& db)
 {
@@ -114,6 +114,7 @@ AnalysePeptideValidated::AnalysePeptideValidated() : score(AnalysePeptideValidat
 /******************** CalculatedPeptide *****************************/
 REGISTER_AND_CONSTRUCT(CalculatedPeptide,"website_calculatedpeptide",score,"score",\
                        sequence,"sequence",\
+                       sequence_aa,"sequence_aa",\
                        analyse,"analyse_id",\
                        error_total,"error_total",\
                        error_aa_cumul,"error_aa_cumul",\
