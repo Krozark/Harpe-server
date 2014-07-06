@@ -50,7 +50,7 @@ int main(int argc,char* argv[])
         q.filter(orm::Q<AnalysePeptideValidated>(score_min,orm::op::gt,AnalysePeptideValidated::_score));
 
     if(score_max > 0)
-        q.filter(orm::Q<AnalysePeptideValidated>(score_min,orm::op::lte,AnalysePeptideValidated::_score));
+        q.filter(orm::Q<AnalysePeptideValidated>(score_max,orm::op::lte,AnalysePeptideValidated::_score));
 
      q.orderBy("?")
         .limit(limit)
