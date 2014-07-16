@@ -250,7 +250,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 
 bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram)
 {
-    bool res =  (version == VERSION);
+    bool res =  (version <= VERSION);
     if(res)
     {
         Client cli;
