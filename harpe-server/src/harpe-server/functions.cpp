@@ -85,8 +85,8 @@ int analyse(ntw::SocketSerialized& sock,int mgf_pk,std::string file_data)
         LOG(sock,"analyse","PK_ERROR");
         sock.setStatus(ERRORS::PK_ERROR);
 
-        con.disconnect();
         con.threadEnd();
+        con.disconnect();
         delete &con;
 
         return 0;
@@ -270,6 +270,7 @@ bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram)
 
         cli.save(false,con);
 
+        con.threadEnd();
         con.disconnect();
         delete &con;
     }
@@ -474,6 +475,7 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
 
     cli.save(false,con);
 
+    con.threadEnd();
     con.disconnect();
     delete &con;
 
@@ -498,6 +500,7 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
     cli.is_active = false;
     cli.save(con);
     */
+    con.threadEnd();
     con.disconnect();
     delete &con;
 
