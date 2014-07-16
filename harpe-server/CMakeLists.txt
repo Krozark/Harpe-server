@@ -14,7 +14,7 @@ project (harpe-server)
 # setup version numbers
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 4)
-set(VERSION_PATCH 3)
+set(VERSION_PATCH 4)
 
 
 # add the  header path

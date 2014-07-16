@@ -136,7 +136,7 @@ REGISTER_AND_CONSTRUCT(HarpeServer,"communication_harpeserver",name,"name",ip,"i
 
 
 /*************** Client ***************/
-REGISTER_AND_CONSTRUCT(Client,"communication_client",ip,"ip",port,"port",server,"server_id",is_active,"is_active");
+REGISTER_AND_CONSTRUCT(Client,"communication_client",ip,"ip",port,"port",server,"server_id",is_active,"is_active",ram,"ram",version,"version");
 
 /*************** M2M Client->AnalysePeptide *************/
 REGISTER_AND_CONSTRUCT(ClientCalculation,"communication_clientcalculation",client,"client_id",analysepeptide,"analysepeptide_id",status,"status");

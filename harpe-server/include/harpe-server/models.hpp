@@ -238,7 +238,10 @@ class Client : public orm::SqlObject<Client>
         orm::FK<HarpeServer,false>  server; ///< communicate whit this server
         orm::BooleanField           is_active;///< true if active
 
-        MAKE_STATIC_COLUMN(ip,port,server,is_active);
+        orm::IntegerField           ram;///<the ram in Mo
+        orm::IntegerField           version;///<the client version
+
+        MAKE_STATIC_COLUMN(ip,port,server,is_active,ram,version);
 };
 
 /**

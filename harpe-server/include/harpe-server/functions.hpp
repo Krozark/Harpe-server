@@ -21,7 +21,8 @@ enum FUNCTION_ID
     GET_VERSION=1,
     ANALYSE=2,
     CLIENT_WAIT_FOR_WORK=3,
-    SEND_PEPTIDE_RESULTS=4
+    SEND_PEPTIDE_RESULTS=4,
+    SEND_CLIENT_CONFIG=5
 };
 
 /**
@@ -70,6 +71,12 @@ void clientWaitForWork(ntw::SocketSerialized& sock);
  * \param pk the analyseMgf pk
  */
 void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status);
+
+/**
+ * \brief get informations from the client
+ * \return true if the version are compatibles, else false
+ */
+bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram);
 
 
 /******************************************************

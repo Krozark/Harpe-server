@@ -15,6 +15,7 @@
 #include <chrono>
 #include <mutex>
 #include <thread>
+
 #include <ORM/backends/op.hpp>
 
 std::mutex peptides_mutex;
@@ -247,6 +248,35 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 }
 
 
+bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram)
+{
+    bool res =  (version == VERSION);
+    if(res)
+    {
+        Client cli;
+
+        orm::DB& con = *Client::default_connection->clone();//a new connection
+        con.connect();
+
+        Client::query(con)\
+            .filter(orm::Q<Client>(sock.getIp(),orm::op::exact,Client::_ip)
+                    and orm::Q<Client>(sock.getPort(),orm::op::exact,Client::_port)
+                    and orm::Q<Client>(true,orm::op::exact,Client::_is_active)
+                    )
+            .get(cli);
+
+        cli.ram = ram;
+        cli.version = version;
+
+        cli.save(false,con);
+
+        con.disconnect();
+        delete &con;
+    }
+    return res;
+
+}
+
 /******************************************************************
  * ******************* REGISTER **********************************
  * ***************************************************************/
@@ -398,6 +428,10 @@ int dispatch(int id,ntw::SocketSerialized& request)
             res = request.getStatus();
 
         }break;
+        case FUNCTION_ID::SEND_CLIENT_CONFIG:
+        {
+            res = ntw::FuncWrapper::srv::exec(getClientInfo,request);
+        }break;
         default:
         break;
     }
@@ -422,14 +456,15 @@ bool get_register_server(const std::string& name)
 
 void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
-    /*Client cli;
+    Client cli;
 
     orm::DB& con = *Client::default_connection->clone();//a new connection
     con.connect();
 
     Client::query(con)\
-        .filter(client.sock().getIp(),"exact",Client::_ip)\
-        .filter(client.sock().getPort(),"exact",Client::_port)\
+        .filter(orm::Q<Client>(client.sock().getIp(),orm::op::exact,Client::_ip)
+            and orm::Q<Client>(client.sock().getPort(),orm::op::exact,Client::_port)
+            )
         .get(cli);
 
     cli.ip = client.sock().getIp();
@@ -437,18 +472,18 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
     cli.server = orm_server;
     cli.is_active = true;
 
-    cli.save(con);
+    cli.save(false,con);
 
     con.disconnect();
     delete &con;
 
-    std::cout<<"Client added"<<std::endl;*/
+    std::cout<<"Client added"<<std::endl;
 }
 
 
 void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
 {
-    /*Client cli;
+    Client cli;
 
     orm::DB& con = *Client::default_connection->clone();//a new connection
     con.connect();
@@ -457,11 +492,14 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
         .filter(client.sock().getIp(),"exact",Client::_ip)\
         .filter(client.sock().getPort(),"exact",Client::_port)\
         .get(cli);
+
+    cli.del(false,con);
+    /*
     cli.is_active = false;
     cli.save(con);
-
+    */
     con.disconnect();
     delete &con;
 
-    std::cout<<"Client delete"<<std::endl;*/
+    std::cout<<"Client delete"<<std::endl;
 }
