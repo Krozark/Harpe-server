@@ -22,9 +22,10 @@ class AA : public orm::SqlObject<AA>
         AA();
 
         orm::CharField<255>     slug;///< the unique identifier
+        orm::CharField<1>       code;///< the unique identifier
         orm::FloatField         mass;///< his mass (in Da)
 
-        MAKE_STATIC_COLUMN(slug,mass);
+        MAKE_STATIC_COLUMN(slug,code,mass);
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 };

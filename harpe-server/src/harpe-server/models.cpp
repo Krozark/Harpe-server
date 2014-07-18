@@ -4,7 +4,7 @@
  ***************************************/
 
 /***************** AA ***********************/
-REGISTER_AND_CONSTRUCT(AA,"website_aa",slug,"slug",mass,"mass");
+REGISTER_AND_CONSTRUCT(AA,"website_aa",slug,"slug",code,"code",mass,"mass");
 
 
 ntw::Serializer& AA::serialize(ntw::Serializer& stream,orm::DB& db)

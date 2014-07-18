@@ -224,8 +224,13 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
             {
                 int pk,mod_pk;
                 sock>>pk>>mod_pk;
-                //TODO add sequence
                 result.sequence+=std::to_string(pk)+":"+std::to_string(mod_pk);
+                orm::Cache<AA>::type_ptr& aa = AA::get(pk,con);
+                //TODO
+                //if(aa->getPk() <= 0) //error
+                    //do something
+                result.sequence_aa+=std::string(aa->code);
+
             }
             is_peak= not is_peak; 
             if(j<seq_size-1)
