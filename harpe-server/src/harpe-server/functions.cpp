@@ -500,11 +500,11 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
         .filter(client.sock().getPort(),"exact",Client::_port)\
         .get(cli);
 
-    cli.del(false,con);
-    /*
+    //cli.del(false,con);
+    
     cli.is_active = false;
     cli.save(con);
-    */
+    
     con.threadEnd();
     con.disconnect();
     delete &con;
