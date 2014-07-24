@@ -28,7 +28,7 @@ int init_deque_peptide()
 
     AnalysePeptide::query()\
     .filter(orm::Q<AnalysePeptide>(0,orm::op::exact,AnalysePeptide::_status)
-            and orm::Q<AnalysePeptide>(false,orm::op::exact,AnalysePeptide::_ignore))\
+            and orm::Q<AnalysePeptide>(false,orm::op::exact,AnalysePeptide::_analyse,AnalyseMgf::_ignore))\
         .orderBy("id")\
         .get(results);
 
@@ -151,6 +151,21 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             
             pep->serialize(sock,con);
             std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
+
+            ClientCalculation cal;
+
+            Client::query(con)
+            .filter(orm::Q<Client>(sock.getIp(),orm::op::exact,Client::_ip)
+                    and orm::Q<Client>(sock.getPort(),orm::op::exact,Client::_port)
+                    and orm::Q<Client>(true,orm::op::exact,Client::_is_active)
+                    )
+            .get(*cal.client);
+
+            cal.analysepeptide = pep;
+            cal.status = ClientCalculation::STATUS::SEND;
+            cal.send_hour = orm::DateTimeField::now();
+
+            cal.save(false,con);
 
             con.threadEnd();
             con.disconnect();
@@ -503,7 +518,7 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
     //cli.del(false,con);
     
     cli.is_active = false;
-    cli.save(con);
+    cli.save(false,con);
     
     con.threadEnd();
     con.disconnect();

@@ -56,13 +56,14 @@ REGISTER_AND_CONSTRUCT(Enzyme,"website_enzyme",name,"name");
 //REGISTER_AND_CONSTRUCT(AnalyseMgf,"website_analysemgf",mgf,"mgf");
 M2M_REGISTER(AnalyseMgf,AAs,AA,"website_analysemgf_AAs","analysemgf_id","aa_id")
 M2M_REGISTER(AnalyseMgf,modification,AAModification,"website_analysemgf_modifications","analysemgf_id","aamodification_id")
-REGISTER(AnalyseMgf,"website_analysemgf",enzyme,"enzyme_id",mgf,"mgf",max_charge,"max_charge",error,"error")
-AnalyseMgf::AnalyseMgf() : enzyme(AnalyseMgf::_enzyme),mgf(AnalyseMgf::_mgf),max_charge(AnalyseMgf::_max_charge),error(AnalyseMgf::_error),AAs(*this), modifications(*this)
+REGISTER(AnalyseMgf,"website_analysemgf",enzyme,"enzyme_id",mgf,"mgf",max_charge,"max_charge",error,"error",ignore,"ignore")
+AnalyseMgf::AnalyseMgf() : enzyme(AnalyseMgf::_enzyme),mgf(AnalyseMgf::_mgf),max_charge(AnalyseMgf::_max_charge),error(AnalyseMgf::_error),ignore(AnalyseMgf::_ignore),AAs(*this), modifications(*this)
 {
     enzyme.registerAttr(*this);
     mgf.registerAttr(*this);
     max_charge.registerAttr(*this);
     error.registerAttr(*this);
+    ignore.registerAttr(*this);
 }
 
 ntw::Serializer& AnalyseMgf::serialize(ntw::Serializer& stream,orm::DB& db)
@@ -92,7 +93,7 @@ ntw::Serializer& AnalyseMgf::serialize(ntw::Serializer& stream,orm::DB& db)
 
 
 /********************** AnalysePeptide ******************************/
-REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",cmpd,"cmpd",status,"status",ignore,"ignore");
+REGISTER_AND_CONSTRUCT(AnalysePeptide,"website_analysepeptide",analyse,"analyse_id",name,"name",mz,"mz",mass,"mass",intensity,"intensity",charge,"charge",mgf_part,"mgf_part",cmpd,"cmpd",status,"status");
 
 ntw::Serializer& AnalysePeptide::serialize(ntw::Serializer& stream,orm::DB& db)
 {
@@ -139,5 +140,5 @@ REGISTER_AND_CONSTRUCT(HarpeServer,"communication_harpeserver",name,"name",ip,"i
 REGISTER_AND_CONSTRUCT(Client,"communication_client",ip,"ip",port,"port",server,"server_id",is_active,"is_active",ram,"ram",version,"version");
 
 /*************** M2M Client->AnalysePeptide *************/
-REGISTER_AND_CONSTRUCT(ClientCalculation,"communication_clientcalculation",client,"client_id",analysepeptide,"analysepeptide_id",status,"status");
+REGISTER_AND_CONSTRUCT(ClientCalculation,"communication_clientcalculation",client,"client_id",analysepeptide,"analysepeptide_id",status,"status",send_hour,"send_hour",recive_hour,"recive_hour");
 
