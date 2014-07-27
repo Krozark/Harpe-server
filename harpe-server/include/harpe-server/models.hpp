@@ -104,12 +104,14 @@ class AnalyseMgf : public orm::SqlObject<AnalyseMgf>
         orm::CharField<255>                         mgf; ///< the path of the mgf file
         orm::IntegerField                           max_charge;
         orm::FloatField                             error;
+        orm::BooleanField                           ignore;//<true if not need to analyse
         //descriptif
         //created
         orm::ManyToMany<AnalyseMgf,AA>              AAs; ///< the AAs used for this analyse
         orm::ManyToMany<AnalyseMgf,AAModification>  modifications; ///< the post trductional modification
+
         
-        MAKE_STATIC_COLUMN(mgf,enzyme,max_charge,error);
+        MAKE_STATIC_COLUMN(mgf,enzyme,max_charge,error,ignore);
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
 
@@ -138,9 +140,8 @@ class AnalysePeptide : public orm::SqlObject<AnalysePeptide>
         orm::IntegerField           cmpd;//< the compound number
         orm::IntegerField           status;///< the status of this analyse  CHOICES = (0,'-'),(1,u'calculé'),(2,u'timeout'),(3,u'out of memory')
 
-        orm::BooleanField           ignore;//<true if not need to analyse
 
-        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status,ignore);
+        MAKE_STATIC_COLUMN(analyse,name,mz,mass,intensity,charge,mgf_part,cmpd,status);
 
 
         ntw::Serializer& serialize(ntw::Serializer& stream,orm::DB& self);
@@ -251,15 +252,21 @@ class Client : public orm::SqlObject<Client>
 class ClientCalculation : public orm::SqlObject<ClientCalculation>
 {
     public:
+        enum STATUS{
+            SEND = 1,
+            RECV = 2,
+            UNCONNECTED = 3
+        };
+
         ClientCalculation();
 
         orm::FK<Client,false>           client;///< the client
         orm::FK<AnalysePeptide,false>   analysepeptide; ///< the analyse
-        orm::IntegerField               status;//STATES  = [(1,u"Envoyé"),(2,u"Reçu"),(3,u"Déconnecté")]
-        //send_houre      = models.DateTimeField(_("Envoyé à"))
-        //recive_houre    = models.DateTimeField(_("Reçu à"))
+        orm::IntegerField               status;//STATUS
+        orm::DateTimeField              send_hour;
+        orm::DateTimeField              recive_hour;
 
-        MAKE_STATIC_COLUMN(client,analysepeptide,status);
+        MAKE_STATIC_COLUMN(client,analysepeptide,status,send_hour,recive_hour);
 };
 
 #include <deque>
