@@ -24,6 +24,8 @@ std::deque<std::shared_ptr<AnalysePeptide>> peptides;
 
 int init_deque_peptide()
 {
+    std::lock_guard<std::mutex> lock(peptides_mutex);//lock    
+
     std::list<orm::Cache<AnalysePeptide>::type_ptr> results;    
 
     AnalysePeptide::query()\
