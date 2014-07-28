@@ -1,6 +1,7 @@
 #include <harpe-server/functions.hpp>
 #include <harpe-server/defines.hpp>
 #include <harpe-server/models.hpp>
+#include <Socket/server/Server.hpp>
 
 #include <mgf/Driver.hpp>
 #include <mgf/Convert.hpp>
@@ -20,6 +21,8 @@
 
 std::mutex peptides_mutex;
 std::deque<std::shared_ptr<AnalysePeptide>> peptides;
+
+ntw::srv::Server* server = nullptr;
 
 
 int init_deque_peptide()
@@ -300,6 +303,14 @@ bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram)
 
 }
 
+
+int restart(ntw::SocketSerialized& sock)
+{
+    std::cout<<"[restart] "<<"Recv restart signal"<<std::endl;
+    server->stop();
+    return  0;
+}
+
 /******************************************************************
  * ******************* REGISTER **********************************
  * ***************************************************************/
@@ -454,6 +465,10 @@ int dispatch(int id,ntw::SocketSerialized& request)
         case FUNCTION_ID::SEND_CLIENT_CONFIG:
         {
             res = ntw::FuncWrapper::srv::exec(getClientInfo,request);
+        }break;
+        case FUNCTION_ID::RESTART:
+        {
+            res = ntw::FuncWrapper::srv::exec(restart,request);
         }break;
         default:
         break;

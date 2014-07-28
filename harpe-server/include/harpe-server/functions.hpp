@@ -22,7 +22,8 @@ enum FUNCTION_ID
     ANALYSE=2,
     CLIENT_WAIT_FOR_WORK=3,
     SEND_PEPTIDE_RESULTS=4,
-    SEND_CLIENT_CONFIG=5
+    SEND_CLIENT_CONFIG=5,
+    RESTART=6
 };
 
 /**
@@ -78,6 +79,12 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status);
  */
 bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram);
 
+/**
+ * \brief todo
+ * \todo
+ */
+int restart(ntw::SocketSerialized& sock);
+
 
 /******************************************************
  ******************** REGISTER ***********************
@@ -116,5 +123,8 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client);
  * \brief call back on delete client
  */
 void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client);
+
+
+extern ntw::srv::Server* server;
 
 #endif

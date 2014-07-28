@@ -18,8 +18,6 @@ orm::DB& orm::DB::Default = def;
 #include <ORM/core/Tables.hpp>
 
 
-ntw::srv::Server* server = nullptr;
-
 /**
  * \brief Signal hnadler to stop the server
  * proprey
