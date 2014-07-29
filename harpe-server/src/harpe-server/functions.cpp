@@ -548,7 +548,7 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
     con.disconnect();
     delete &con;
 
-    utils::log::info("Register","new client added");
+    utils::log::todo("Register","Client",client.sock().id(),"added");
 }
 
 
@@ -573,5 +573,5 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
     con.disconnect();
     delete &con;
 
-    utils::log::info("Unregister","Client removed");
+    utils::log::todo("Unregister","Client",client.sock().id(),"removed");
 }

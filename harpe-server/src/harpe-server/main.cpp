@@ -100,7 +100,7 @@ int main(int argc,char* argv[])
         ///unregister from the website
         unregister_to_website(port_server,argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
     }
-    utils::log::ok("Good bye");
+    utils::log::todo("Good bye");
 
     ntw::Socket::close();
 
