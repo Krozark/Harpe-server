@@ -257,6 +257,17 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
                 result.sequence+=",";
         }
         result.save(true,con);
+
+        ClientCalculation cal;
+
+        ClientCalculation::query(con)
+        .filter(orm::Q<ClientCalculation>(pep->getPk(),orm::op::exact,ClientCalculation::_analysepeptide))
+        .get(cal);
+
+        cal.status = ClientCalculation::STATUS::RECV;
+        cal.recive_hour = orm::DateTimeField::now();
+
+        cal.save(false,con);
     }
 
     pep->save(true,con);
