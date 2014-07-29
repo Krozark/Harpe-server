@@ -14,7 +14,7 @@ project (harpe-server)
 # setup version numbers
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 4)
-set(VERSION_PATCH 6)
+set(VERSION_PATCH 7)
 
 
 # add the  header path
@@ -46,7 +46,8 @@ find_library(SQLITE_LIB sqlite3)
 find_library(ORM_LIB orm)
 find_library(MGF_LIB mgf)
 find_library(SOCKET_LIB socket)
-set(LIBS ${LIBS} ${MYSQL_LIB} ${SQLITE_LIB} ${ORM_LIB} ${MGF_LIB} ${SOCKET_LIB})
+find_library(UTILS_LIB utils)
+set(LIBS ${LIBS} ${MYSQL_LIB} ${SQLITE_LIB} ${ORM_LIB} ${MGF_LIB} ${SOCKET_LIB} ${UTILS_LIB})
 
 set(WARNING "-Wall")
 #set(FLAGS "-o3 -std=c++0x -Wl,--no-as-needed -ldl")

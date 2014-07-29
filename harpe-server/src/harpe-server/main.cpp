@@ -17,6 +17,8 @@ orm::DB& orm::DB::Default = def;
 
 #include <ORM/core/Tables.hpp>
 
+#include <utils/log.hpp>
+
 
 /**
  * \brief Signal hnadler to stop the server
@@ -24,7 +26,7 @@ orm::DB& orm::DB::Default = def;
  */
 void stop_server_handler(int sig)
 {
-    std::cout<<"Recv signal "<<sig<<". Stoping server.\n Please wait."<<std::endl;
+    utils::log::warning("Signal","Recv signal",sig,". Stoping server.\n Please wait.");
     if(server)
         server->stop();
 }
@@ -33,10 +35,11 @@ void stop_server_handler(int sig)
  */
 int main(int argc,char* argv[])
 {
-    std::cout<<"===\nHarpe server\nversion:"<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"\n===\n"<<std::endl;
+    std::clog<<utils::log::colors::green<<"===\nHarpe server\nversion:"<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"\n===\n"<<utils::log::colors::reset<<std::endl;
+
     if(argc < SERVER_PORT)
     {
-        std::cout<<"Usage are: "<<argv[0]<<" <server name> <website-host> <website-port>[server-port]"<<std::endl;
+        utils::log::error("Usage",argv[0],"<server name> <website-host> <website-port>[server-port]");
         return 1;
     }
     
@@ -61,12 +64,12 @@ int main(int argc,char* argv[])
         {
             init_deque_peptide();
 
-            std::cout<<"[Server start] on:"
-                <<"\n\tPort : "<<port_server
+            utils::log::ok("Server start","on:",
+                "\n\tPort :",port_server,
                 //<<"\n\tclient port : "<<port_client
-                <<"\n\twebsite host : "<<argv[WEBSITE_HOST]
-                <<"\n\twebsite port : "<<argv[WEBSITE_PORT]
-                <<std::endl;
+                "\n\twebsite host :",argv[WEBSITE_HOST],
+                "\n\twebsite port :",argv[WEBSITE_PORT]
+                );
 
             std::signal(SIGINT, stop_server_handler);
 
@@ -82,22 +85,22 @@ int main(int argc,char* argv[])
             }
             catch(ntw::SocketExeption& e)
             {
-                std::cout<<e.what()<<std::endl;
+                utils::log::error("Exeption",e.what());
             }
 
 
-            std::cout<<"Server is close"<<std::endl;
+            utils::log::error("Server is close");
             orm::DB::Default.disconnect();
         }
         else
         {
-            std::cerr<<"Error whene get server info fron the DB"<<std::endl;
+            utils::log::error("Error","whene get server info fron the DB");
         }
 
         ///unregister from the website
         unregister_to_website(port_server,argv[WEBSITE_HOST],website_port,argv[SERVER_NAME]);
     }
-    std::cout<<"Good bye"<<std::endl;
+    utils::log::ok("Good bye");
 
     ntw::Socket::close();
 

@@ -8,6 +8,7 @@
 
 #include <Socket/FuncWrapper.hpp>
 #include <harpe-algo/Sequence.hpp>
+#include <utils/log.hpp>
 
 #include <sstream>
 #include <deque>
@@ -37,7 +38,7 @@ int init_deque_peptide()
         .orderBy("id")\
         .get(results);
 
-    std::cout<<"[init_deque_peptide] "<<results.size()<<" peptides to calc"<<std::endl;
+    utils::log::todo("init",results.size(),"peptides to calc");
 
     for(auto& i : results)
     {
@@ -155,7 +156,7 @@ void clientWaitForWork(ntw::SocketSerialized& sock)
             con.connect();
             
             pep->serialize(sock,con);
-            std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
+            utils::log::info("clientWaitForWork",sock.id(),"=> Send datas of size :",sock.size()," with status",sock.getStatus());
 
             ClientCalculation cal;
 
@@ -192,7 +193,7 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 {
     unsigned int size = 0;
     sock>>size;
-    std::cout<<"[sendPeptideResults] <"<<sock.id()<<"> Recv solutions <"<<size<<"> for AnalyseMgf of pk <"<<id<<">"<<std::endl;
+    utils::log::info("sendPeptideResults",sock.id(),"=> Recv size",size,"solutions for AnalyseMgf of pk <",id,">");
 
     orm::DB& con = *AnalysePeptide::default_connection->clone();//a new connection
     con.connect();
@@ -258,19 +259,22 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
         }
         result.save(true,con);
 
-        ClientCalculation cal;
-
-        ClientCalculation::query(con)
-        .filter(orm::Q<ClientCalculation>(pep->getPk(),orm::op::exact,ClientCalculation::_analysepeptide))
-        .get(cal);
-
-        cal.status = ClientCalculation::STATUS::RECV;
-        cal.recive_hour = orm::DateTimeField::now();
-
-        cal.save(false,con);
     }
 
     pep->save(true,con);
+
+    ClientCalculation cal;
+
+    ClientCalculation::query(con)
+        .filter(orm::Q<ClientCalculation>(sock.getIp(),orm::op::exact,ClientCalculation::_client,Client::_ip)
+                and orm::Q<ClientCalculation>(sock.getPort(),orm::op::exact,ClientCalculation::_client,Client::_port)
+                and orm::Q<ClientCalculation>(true,orm::op::exact,ClientCalculation::_client,Client::_is_active)
+                and orm::Q<ClientCalculation>(pep->getPk(),orm::op::exact,ClientCalculation::_analysepeptide))
+    .get(cal);
+
+    cal.status = ClientCalculation::STATUS::RECV;
+    cal.recive_hour = orm::DateTimeField::now();
+    cal.save(false,con);
 
     con.endTransaction();
     con.threadEnd();
@@ -279,14 +283,21 @@ void sendPeptideResults(ntw::SocketSerialized& sock,int id,int status)
 
     sock.clear();
     sock.setStatus(ntw::Status::ok);
-    std::cout<<"[clientWaitForWork] <"<<sock.id()<<"> Send datas : "<<sock.size()<<" "<<sock.getStatus()<<std::endl;
+    utils::log::info("clientWaitForWork",sock.id()," => Send datas of size ",sock.size(),"status:",sock.getStatus());
     sock.sendCl();
 }
 
 
 bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram)
 {
-    bool res =  (version <= VERSION);
+    bool res =  false;
+    //check version compatibility
+    if(VERSION < 500)
+    {
+        if(version < 500)
+            res = true;
+    }
+
     if(res)
     {
         Client cli;
@@ -317,7 +328,7 @@ bool getClientInfo(ntw::SocketSerialized& sock,int version,int ram)
 
 int restart(ntw::SocketSerialized& sock)
 {
-    std::cout<<"[restart] "<<"Recv restart signal"<<std::endl;
+    utils::log::warning("restart","Recv restart signal");
     server->stop();
     return  0;
 }
@@ -334,58 +345,63 @@ int register_to_website(int port_server,char host[],int port,const std::string& 
 {
     int status = 0;
 
-    std::cout<<"[Loggin to website] "<<host<<":"<<port<<std::endl;
+    utils::log::info("Logging","Loggin to website ",host,":",port);
     ntw::Socket website_sock(ntw::Socket::Domain::IP,ntw::Socket::Type::TCP);
-    website_sock.connect(host,port);
-    std::string msg;
-    msg += std::string("GET /register/?name=");
-    msg += name;
-    msg += "&port=";
-    msg += std::to_string(port_server);
-    msg += "&version=";
-    msg += std::to_string(VERSION);
-    msg +=" ";
-    msg += "HTTP/1.1\r\nHOST: ";
-    msg += host;
-    msg += "\r\n\r\n";
-
-    char buffer[1024];
-    website_sock.send(msg.c_str(),msg.size());
-
-    int recv;
-    float version = 0;
-    while((recv = website_sock.receive(buffer,1024))>0)
+    if(website_sock.connect(host,port))
     {
-        //std::cout.write(buffer,recv);
-        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
-    }
-    //std::cout<<std::endl<<std::flush;
+        utils::log::ok("website Connect","Connexion etablish");
+        std::string msg;
+        msg += std::string("GET /register/?name=");
+        msg += name;
+        msg += "&port=";
+        msg += std::to_string(port_server);
+        msg += "&version=";
+        msg += std::to_string(VERSION);
+        msg +=" ";
+        msg += "HTTP/1.1\r\nHOST: ";
+        msg += host;
+        msg += "\r\n\r\n";
 
-    if(version > 0)
-    {
-        std::cout<<"Status : "<<status<<std::endl;
-        switch (status)
+        char buffer[1024];
+        website_sock.send(msg.c_str(),msg.size());
+
+        int recv;
+        float version = 0;
+        while((recv = website_sock.receive(buffer,1024))>0)
         {
-            case 200 :///ok
-                {
-                }break;
-            case 211 : /// no name (set in code)
-                {
-                }break;
-            case 212 :/// no port (set in code)
-                {
-                }break;
-            case 213 :///unknow ip
-                {
-                }break;
-            case 214 :/// no object find
-                {
-                }break;
-            default:///?
-                {
-                }break;
+            //std::cout.write(buffer,recv);
+            sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+        }
+        //std::cout<<std::endl<<std::flush;
+
+        if(version > 0)
+        {
+            utils::log::info("Status",status);
+            switch (status)
+            {
+                case 200 :///ok
+                    {
+                    }break;
+                case 211 : /// no name (set in code)
+                    {
+                    }break;
+                case 212 :/// no port (set in code)
+                    {
+                    }break;
+                case 213 :///unknow ip
+                    {
+                    }break;
+                case 214 :/// no object find
+                    {
+                    }break;
+                default:///?
+                    {
+                    }break;
+            }
         }
     }
+    else
+        utils::log::error("website Connect","Connexion not etablish");
     return status;
 }
 
@@ -394,63 +410,68 @@ int unregister_to_website(int port_server,char host[],int port,const std::string
 {
     int status = 0;
 
-    std::cout<<"[Unloggin to website] "<<host<<":"<<port<<std::endl;
+    utils::log::warning("Logout","to website",host,":",port);
     ntw::Socket website_sock(ntw::Socket::Domain::IP,ntw::Socket::Type::TCP);
-    website_sock.connect(host,port);
-    std::string msg;
-    msg += std::string("GET /unregister/?name=");
-    msg += name;
-    msg += "&port=";
-    msg += std::to_string(port_server);
-    msg +=" ";
-    msg += "HTTP/1.1\r\nHOST: ";
-    msg += host;
-    msg += "\r\n\r\n";
-
-    char buffer[1024];
-    website_sock.send(msg.c_str(),msg.size());
-
-    int recv;
-    float version = 0;
-    while((recv = website_sock.receive(buffer,1024))>0)
+    if(website_sock.connect(host,port))
     {
-        //std::cout.write(buffer,recv);
-        sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
-    }
-    //std::cout<<std::endl<<std::flush;
+        utils::log::ok("website Connect","Connexion etablish");
+        std::string msg;
+        msg += std::string("GET /unregister/?name=");
+        msg += name;
+        msg += "&port=";
+        msg += std::to_string(port_server);
+        msg +=" ";
+        msg += "HTTP/1.1\r\nHOST: ";
+        msg += host;
+        msg += "\r\n\r\n";
 
-    if(version > 0)
-    {
-        std::cout<<"Status : "<<status<<std::endl;
-        switch (status)
+        char buffer[1024];
+        website_sock.send(msg.c_str(),msg.size());
+
+        int recv;
+        float version = 0;
+        while((recv = website_sock.receive(buffer,1024))>0)
         {
-            case 200 :///ok
-                {
-                }break;
-            case 211 : /// no name (set in code)
-                {
-                }break;
-            case 212 :/// no port (set in code)
-                {
-                }break;
-            case 213 :///unknow ip
-                {
-                }break;
-            case 214 :/// no object find
-                {
-                }break;
-            default:///?
-                {
-                }break;
+            //std::cout.write(buffer,recv);
+            sscanf(buffer,"HTTP/%f %d %*s",&version,&status);
+        }
+        //std::cout<<std::endl<<std::flush;
+
+        if(version > 0)
+        {
+            utils::log::info("Status",status);
+            switch (status)
+            {
+                case 200 :///ok
+                    {
+                    }break;
+                case 211 : /// no name (set in code)
+                    {
+                    }break;
+                case 212 :/// no port (set in code)
+                    {
+                    }break;
+                case 213 :///unknow ip
+                    {
+                    }break;
+                case 214 :/// no object find
+                    {
+                    }break;
+                default:///?
+                    {
+                    }break;
+            }
         }
     }
+    else
+        utils::log::error("website Connect","Connexion not etablish");
     return status;
 }
 
 int dispatch(int id,ntw::SocketSerialized& request)
 {
     int res= ntw::Status::wrong_id;
-    std::cout<<"[dispatch] id:"<<id<<std::endl<<std::flush;
+    utils::log::warning("dispatch",id);
     switch(id)
     {
         case FUNCTION_ID::GET_VERSION:
@@ -527,7 +548,7 @@ void register_client(ntw::srv::Server& self,ntw::srv::Client& client)
     con.disconnect();
     delete &con;
 
-    std::cout<<"Client added"<<std::endl;
+    utils::log::info("Register","new client added");
 }
 
 
@@ -552,5 +573,5 @@ void unregister_client(ntw::srv::Server& self,ntw::srv::Client& client)
     con.disconnect();
     delete &con;
 
-    std::cout<<"Client delete"<<std::endl;
+    utils::log::info("Unregister","Client removed");
 }
