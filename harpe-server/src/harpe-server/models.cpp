@@ -4,14 +4,15 @@
  ***************************************/
 
 /***************** AA ***********************/
-REGISTER_AND_CONSTRUCT(AA,"website_aa",slug,"slug",code,"code",mass,"mass");
+REGISTER_AND_CONSTRUCT(AA,"website_aa",/*slug,"slug",*/code,"code",mass,"mass");
 
 
 ntw::Serializer& AA::serialize(ntw::Serializer& stream,orm::DB& db)
 {
     stream<<this->pk
-        <<this->slug
+        <<this->code
         <<this->mass;
+    std::cout<<this->code<<":"<<this->mass<<std::endl;
     return stream;
 }
 
