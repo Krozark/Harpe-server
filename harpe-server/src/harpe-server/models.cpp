@@ -12,7 +12,6 @@ ntw::Serializer& AA::serialize(ntw::Serializer& stream,orm::DB& db)
     stream<<this->pk
         <<this->code
         <<this->mass;
-    std::cout<<this->code<<":"<<this->mass<<std::endl;
     return stream;
 }
 
